@@ -259,83 +259,77 @@
 		</Container>
 		<Container name="Notifications">
 			<Key ID="STR_PPL_Main_Notifications_Missing_Template_Name">
-				<English>Persistent Player Loadouts\n\nMissing template name.</English>
-				<German>Persistent Player Loadouts\n\nName der Vorlage fehlt.</German>
+				<English>Persistent Player Loadout\n\nMissing template name.</English>
+				<German>Persistent Player Loadout\n\nName der Vorlage fehlt.</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Notifications_No_Tracking_Value_Selected">
-				<English>Persistent Player Loadouts\n\nNo value for tracking selected.</English>
-				<German>Persistent Player Loadouts\n\nKein Wert zur Verfolgung ausgewählt.</German>
+				<English>Persistent Player Loadout\n\nNo value for tracking selected.</English>
+				<German>Persistent Player Loadout\n\nKein Wert zur Verfolgung ausgewählt.</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Notifications_Sending_Data_Not_Allowed">
-				<English>Persistent Player Loadouts\n\nSending data not allowed. See mod settings.</English>
-				<German>Persistent Player Loadouts\n\nDas Senden von Daten ist deaktiviert. Schau in die Mod-Einstellungen.</German>
+				<English>Persistent Player Loadout\n\nSending data not allowed. See mod settings.</English>
+				<German>Persistent Player Loadout\n\nDas Senden von Daten ist deaktiviert. Schau in die Mod-Einstellungen.</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Notifications_Login_Denied_Too_Many_Admins">
-				<English>Persistent Player Loadouts\n\nAdmin login denied. There ist another admin logged in.</English>
-				<German>Persistent Player Loadouts\n\nAdmin Login verweigert. Es ist bereits ein Admin eingeloggt.</German>
+				<English>Persistent Player Loadout\n\nAdmin login denied. There ist another admin logged in.</English>
+				<German>Persistent Player Loadout\n\nAdmin Login verweigert. Es ist bereits ein Admin eingeloggt.</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Notifications_Login_Denied_Missing_Permission">
-				<English>Persistent Player Loadouts\n\nAdmin login denied. You have no admin permissions. Ask your server admin.</English>
-				<German>Persistent Player Loadouts\n\nAdmin Login verweigert. Du hast keine Admin-Berechtigung. Frag deinen Server-Administrator.</German>
+				<English>Persistent Player Loadout\n\nAdmin login denied. You have no admin permissions. Ask your server admin.</English>
+				<German>Persistent Player Loadout\n\nAdmin Login verweigert. Du hast keine Admin-Berechtigung. Frag deinen Server-Administrator.</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Notifications_Template_Saved">
-				<English>Persistent Player Loadouts\n\nTemplate saved: %1</English>
-				<German>Persistent Player Loadouts\n\nVorlage wurde gesichert: %1</German>
+				<English>Persistent Player Loadout\n\nTemplate saved: %1</English>
+				<German>Persistent Player Loadout\n\nVorlage wurde gesichert: %1</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Notifications_Event_Continued">
-				<English>Persistent Player Loadouts\n\nEvent Continued: %1</English>
-				<German>Persistent Player Loadouts\n\nEvent wurde fortgesetzt: %1</German>
+				<English>Persistent Player Loadout\n\nEvent Continued: %1</English>
+				<German>Persistent Player Loadout\n\nEvent wurde fortgesetzt: %1</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Notifications_Event_Stopped">
-				<English>Persistent Player Loadouts\n\nEvent stopped: %1</English>
-				<German>Persistent Player Loadouts\n\nEvent wurde beendet: %1</German>
+				<English>Persistent Player Loadout\n\nEvent stopped: %1</English>
+				<German>Persistent Player Loadout\n\nEvent wurde beendet: %1</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Notifications_Event_Deleted">
-				<English>Persistent Player Loadouts\n\nEvent deleted: %1</English>
-				<German>Persistent Player Loadouts\n\nEvent wurde gelöscht: %1</German>
+				<English>Persistent Player Loadout\n\nEvent deleted: %1</English>
+				<German>Persistent Player Loadout\n\nEvent wurde gelöscht: %1</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Notifications_Player_Deleted">
-				<English>Persistent Player Loadouts\n\nPlayer deleted: %1</English>
-				<German>Persistent Player Loadouts\n\nSpieler wurde gelöscht: %1</German>
+				<English>Persistent Player Loadout\n\nPlayer deleted: %1</English>
+				<German>Persistent Player Loadout\n\nSpieler wurde gelöscht: %1</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Notifications_Player_Promoted">
-				<English>Persistent Player Loadouts\n\nPlayer promoted: %1</English>
-				<German>Persistent Player Loadouts\n\nSpieler wurde befördert: %1</German>
+				<English>Persistent Player Loadout\n\nPlayer promoted: %1</English>
+				<German>Persistent Player Loadout\n\nSpieler wurde befördert: %1</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Notifications_Player_Degraded">
-				<English>Persistent Player Loadouts\n\nPlayer degraded: %1</English>
-				<German>Persistent Player Loadouts\n\nSpieler wurde degradiert: %1</German>
+				<English>Persistent Player Loadout\n\nPlayer degraded: %1</English>
+				<German>Persistent Player Loadout\n\nSpieler wurde degradiert: %1</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Notifications_Tracking">
-				<English>Persistent Player Loadouts\n\nKey: %1\nValue: %2</English>
-				<German>Persistent Player Loadouts\n\nSchlüssel: %1\nWert: %2</German>
+				<English>Persistent Player Loadout\n\nKey: %1\nValue: %2</English>
+				<German>Persistent Player Loadout\n\nSchlüssel: %1\nWert: %2</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Notifications_Details">
-				<English>Persistent Player Loadouts\nDetails\n\n%1</English>
-				<German>Persistent Player Loadouts\nDetails\n\n%1</German>
+				<English>Persistent Player Loadout\nDetails\n\n%1</English>
+				<German>Persistent Player Loadout\nDetails\n\n%1</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Notifications_Loadouts_Exported_To_Clipboard">
-				<English>Persistent Player Loadouts\n\nLoadouts exported to Clipboard.</English>
-				<German>Persistent Player Loadouts\n\nAusrüstungen in die Zwischenablage exportiert.</German>
+				<English>Persistent Player Loadout\n\nLoadouts exported to Clipboard.</English>
+				<German>Persistent Player Loadout\n\nAusrüstungen in die Zwischenablage exportiert.</German>
 			</Key>
-			<Key ID="STR_PPL_Main_Notifications_No_Event_Selected">
-				<English>Persistent Player Loadouts\n\nNo event selected.</English>
-				<German>Persistent Player Loadouts\n\nKein Event ausgewählt.</German>
+			<Key ID="STR_PPL_Main_Notifications_No_Template_Selected">
+				<English>Persistent Player Loadout\n\nNo template selected.</English>
+				<German>Persistent Player Loadout\n\nKeine Vorlage ausgewählt.</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Notifications_No_Player_Selected">
-				<English>Persistent Player Loadouts\n\nNo player selected.</English>
-				<German>Persistent Player Loadouts\n\nKein Spieler ausgewählt.</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Notifications_Event_In_Progress">
-				<English>Persistent Player Loadouts\n\nEvent in progress. Please stop this event before continue another event.</English>
-				<German>Persistent Player Loadouts\n\nEs läuft bereits ein Event. Bitte beende das laufende Event befor du ein anderes Event fortsetzt.</German>
+				<English>Persistent Player Loadout\n\nNo player selected.</English>
+				<German>Persistent Player Loadout\n\nKein Spieler ausgewählt.</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Notifications_Singleplayer_Not_Supported">
-				<English>Persistent Player Loadouts\n\nSingleplayer mode is not supported.</English>
-				<German>Persistent Player Loadouts\n\nDer Einzelspielermodus wird nicht unterstützt.</German>
+				<English>Persistent Player Loadout\n\nSingleplayer mode is not supported.</English>
+				<German>Persistent Player Loadout\n\nDer Einzelspielermodus wird nicht unterstützt.</German>
 			</Key>
-		</Container>
-		<Container name="Loadouts">
 		</Container>
 	</Package>
 </Project>
