@@ -64,7 +64,7 @@ class PPL_Main_Dialog
 		class RscText_1007: RscText
 		{
 			idc = 1007;
-			text = $STR_PPL_Main_Dialog_Events;
+			text = $STR_PPL_Main_Dialog_Templates;
 			x = 0 * GUI_GRID_W + GUI_GRID_X;
 			y = 14 * GUI_GRID_H + GUI_GRID_Y;
 			w = 6 * GUI_GRID_W;
@@ -74,7 +74,7 @@ class PPL_Main_Dialog
 		class RscText_1008: RscText
 		{
 			idc = 1008;
-			text = $STR_PPL_Main_Dialog_Statistics;
+			text = $STR_PPL_Main_Dialog_Loadouts;
 			x = 20 * GUI_GRID_W + GUI_GRID_X;
 			y = 4 * GUI_GRID_H + GUI_GRID_Y;
 			w = 6 * GUI_GRID_W;
@@ -171,13 +171,13 @@ class PPL_Main_Dialog
 		class PPL_RscButton_1602: RscButton
 		{
 			idc = 1602;
-			text = $STR_PPL_Main_Dialog_Button_Start;
+			text = $STR_PPL_Main_Dialog_Button_Template_Save;
 			x = 13 * GUI_GRID_W + GUI_GRID_X;
 			y = 22.5 * GUI_GRID_H + GUI_GRID_Y;
 			w = 6 * GUI_GRID_W;
 			h = 1 * GUI_GRID_H;
 			
-			action = "[] call PPL_fnc_dialogButtonEventStartExec;";
+			action = "[] call PPL_fnc_dialogButtonTemplateSaveExec;";
 		};
 		class PPL_RscButton_1606: RscButton
 		{
@@ -231,7 +231,7 @@ class PPL_Main_Dialog
 			w = 6 * GUI_GRID_W;
 			h = 1 * GUI_GRID_H;
 			
-			action = "[] call PPL_fnc_dialogButtonStatisticsTrackExec;";
+			action = "";
 		};
 		class PPL_RscButton_1605: RscButton
 		{
@@ -242,7 +242,7 @@ class PPL_Main_Dialog
 			w = 6 * GUI_GRID_W;
 			h = 1 * GUI_GRID_H;
 			
-			action = "[] call PPL_fnc_dialogButtonStatisticsExportExec;";
+			action = "[] call PPL_fnc_dialogButtonLoadoutsExportExec;";
 		};
 		class PPL_RscButton_1601: RscButton
 		{

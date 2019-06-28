@@ -32,7 +32,7 @@ class CfgPatches
 
 class CfgMods
 {
-    class PPS
+    class PPL
 	{
         dir = "@PPL";
         name = "Persistent Player Loadout";
@@ -78,9 +78,9 @@ class CfgSettings
 
 class Extended_PreInit_EventHandlers
 {
-	PPS_PreInit = call compile preprocessFileLineNumbers "y\ppl\addons\ppl_main\XEH_preInit.sqf";
+	PPL_PreInit = call compile preprocessFileLineNumbers "y\ppl\addons\ppl_main\XEH_preInit.sqf";
 	
-	class PPS_PreInits
+	class PPL_PreInits
 	{
         // Like the normal preinit above, this one runs on all machines
         init = "";
