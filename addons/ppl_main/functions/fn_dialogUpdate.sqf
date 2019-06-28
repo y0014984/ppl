@@ -27,18 +27,10 @@ _playersListBox ctrlAddEventHandler ["LBSelChanged",
 
 	if (_selectedIndex != -1) then
 	{
-		_requestedPlayerUid = _control lbData _selectedIndex;
 		_text = _control lbText _selectedIndex;
 		
 		_promoteButton = (findDisplay 24984) displayCtrl 1610;
-		
-		_playerUid = getPlayerUID player;
-		_clientId = clientOwner;
-		
-		_filterEventsEditBox = (findDisplay 24984) displayCtrl 1401;
-		
-		_filterEvents = "";
-	
+
 		if ((_text find (localize "STR_PPL_Main_Admin")) > -1) then
 		{
 			_promoteButton ctrlSetText localize "STR_PPL_Main_Dialog_Button_Degrade";
@@ -47,17 +39,13 @@ _playersListBox ctrlAddEventHandler ["LBSelChanged",
 		{
 			_promoteButton ctrlSetText localize "STR_PPL_Main_Dialog_Button_Promote";
 		};
-		
-		_request = _playerUid + "-requestEventsFiltered";
-		missionNamespace setVariable [_request, [_playerUid, _clientId, _requestedPlayerUid, _filterEvents], false];
-		publicVariableServer _request;
 	};
 }];
 
 /* ================================================================================ */
 
-_eventsListBox = (findDisplay 24984) displayCtrl 1501;
-_eventsListBox ctrlAddEventHandler ["LBSelChanged",
+_templatesListBox = (findDisplay 24984) displayCtrl 1501;
+_templatesListBox ctrlAddEventHandler ["LBSelChanged",
 {
 	params ["_control", "_selectedIndex"];
 
@@ -67,17 +55,15 @@ _eventsListBox ctrlAddEventHandler ["LBSelChanged",
 		_selectedPlayerIndex = lbCurSel _playersListBox;
 		_requestedPlayerUid = _playersListBox lbData _selectedPlayerIndex;
 		
-		_requestedEventId = _control lbData _selectedIndex;
+		_requestedTemplateId = _control lbData _selectedIndex;
 		
 		_playerUid = getPlayerUID player;
 		_clientId = clientOwner;
 		
-		_filterLoadoutsEditBox = (findDisplay 24984) displayCtrl 1402;
-		
 		_filterLoadouts = "";
 	
 		_request = _playerUid + "-requestLoadoutsFiltered";
-		missionNamespace setVariable [_request, [_playerUid, _clientId, _requestedPlayerUid, _requestedEventId, _filterLoadouts], false];
+		missionNamespace setVariable [_request, [_playerUid, _clientId, _requestedPlayerUid, _requestedTemplateId, _filterLoadouts], false];
 		publicVariableServer _request;
 	};
 }];
@@ -121,9 +107,6 @@ _filterPlayersEditBox ctrlAddEventHandler ["KeyUp",
 		_filterPlayersEditBox = (findDisplay 24984) displayCtrl 1400;
 		_filterPlayers = ctrlText _filterPlayersEditBox;
 	
-		_filterEventsEditBox = (findDisplay 24984) displayCtrl 1401;
-		_filterEvents = ctrlText _filterEventsEditBox;
-
 		_playersListBox = (findDisplay 24984) displayCtrl 1500;
 		lbClear _playersListBox;
 		_playersListBox lbSetCurSel -1;
@@ -149,8 +132,8 @@ _filterPlayersEditBox ctrlAddEventHandler ["KeyUp",
 
 /* ================================================================================ */
 
-_filterEventsEditBox = (findDisplay 24984) displayCtrl 1401;
-_filterEventsEditBox ctrlAddEventHandler ["KeyUp",
+_templatesFilterEditBox = (findDisplay 24984) displayCtrl 1401;
+_templatesFilterEditBox ctrlAddEventHandler ["KeyUp",
 {
 	params ["_displayorcontrol", "_key", "_shift", "_ctrl", "_alt"];
 
@@ -159,33 +142,23 @@ _filterEventsEditBox ctrlAddEventHandler ["KeyUp",
 		_playerUid = getPlayerUID player;
 		_clientId = clientOwner;
 
-		_filterPlayersEditBox = (findDisplay 24984) displayCtrl 1400;
-		_filterPlayers = ctrlText _filterPlayersEditBox;
+		_templatesFilterEditBox = (findDisplay 24984) displayCtrl 1401;
+		_filterTemplates = ctrlText _templatesFilterEditBox;
 
-		_filterEventsEditBox = (findDisplay 24984) displayCtrl 1401;
-		_filterEvents = ctrlText _filterEventsEditBox;
-
-		_eventsListBox = (findDisplay 24984) displayCtrl 1501;
-		lbClear _eventsListBox;
-		_eventsListBox lbSetCurSel -1;
+		_templatesListBox = (findDisplay 24984) displayCtrl 1501;
+		lbClear _templatesListBox;
+		_templatesListBox lbSetCurSel -1;
 		
 		{
 			_text = _x select 0;
 			_data = _x select 1;
 			
-			if (((toLower _text) find (toLower _filterEvents)) > -1) then
+			if (((toLower _text) find (toLower _filterTemplates)) > -1) then
 			{
-				_index = _eventsListBox lbAdd _text;
-				_eventsListBox lbSetData [_index, _data];
-				
-				if(PPL_isEvent &&(_dbEventId == PPL_eventId)) then
-				{
-					_eventsListBox lbSetColor [_index, [1, 0.5, 0.5, 1]];
-					_eventsListBox lbSetCurSel _index;
-					_eventsListBox lbSetText [_index, format [localize "STR_PPL_Main_Dialog_List_Event_Active", _text]];
-				};
+				_index = _templatesListBox lbAdd _text;
+				_templatesListBox lbSetData [_index, _data];
 			};
-		} forEach PPL_lbEventsContent;
+		} forEach PPL_lbTemplatesContent;
 	};
 }];
 
@@ -201,9 +174,9 @@ _filterLoadoutsEditBox ctrlAddEventHandler ["KeyUp",
 	_playersListBox = (findDisplay 24984) displayCtrl 1500;
 	_selectedPlayerIndex = lbCurSel _playersListBox;
 	_requestedPlayerUid = _playersListBox lbData _selectedPlayerIndex;
-	_eventsListBox = (findDisplay 24984) displayCtrl 1501;
-	_selectedEventIndex = lbCurSel _eventsListBox;
-	_requestedEventId = _eventsListBox lbData _selectedEventIndex;
+	_templatesListBox = (findDisplay 24984) displayCtrl 1501;
+	_selectedTemplateIndex = lbCurSel _templatesListBox;
+	_requestedTemplateId = _templatesListBox lbData _selectedTemplateIndex;
 	
 	if ((_key == 28) || (_key == 156)) then
 	{
@@ -249,11 +222,9 @@ _answer addPublicVariableEventHandler
 	_countPlayersOnline = _broadcastVariableValue select 5;
 	_countAdminsTotal = _broadcastVariableValue select 6;
 	_countAdminsOnline = _broadcastVariableValue select 7;
-	_countEventsTotal = _broadcastVariableValue select 8;
+	_countTemplatesTotal = _broadcastVariableValue select 8;
 	_filteredPlayers = _broadcastVariableValue select 9;
 
-	_activeEventStartTime = +PPL_eventStartTime;
-	
 	_statusServer = false;
 	if (!isNil "PPL_statusServer") then {_statusServer =  PPL_statusServer;};
 	_versionServer = localize "STR_PPL_Main_Unknown";
@@ -269,21 +240,18 @@ _answer addPublicVariableEventHandler
 	_playersListBox = (findDisplay 24984) displayCtrl 1500;
 	lbClear _playersListBox;
 	_playersListBox lbSetCurSel -1;
-	_eventsListBox = (findDisplay 24984) displayCtrl 1501;
-	lbClear _eventsListBox;
-	_eventsListBox lbSetCurSel -1;
-	_loadoutsListBox = (findDisplay 24984) displayCtrl 1502;
-	lbClear _loadoutsListBox;
-	_loadoutsListBox lbSetCurSel -1;
 	_adminButton = (findDisplay 24984) displayCtrl 1600;
-	_eventStartButton = (findDisplay 24984) displayCtrl 1602;
-	_eventStopButton = (findDisplay 24984) displayCtrl 1607;
+	_templatesText = (findDisplay 24984) displayCtrl 1007;
+	_templatesFilterEditBox = (findDisplay 24984) displayCtrl 1401;
+	_templatesListBox = (findDisplay 24984) displayCtrl 1501;
+	_templateEditBox = (findDisplay 24984) displayCtrl 1603;
+	_templateSaveButton = (findDisplay 24984) displayCtrl 1602;
+	_templateLoadButton = (findDisplay 24984) displayCtrl 1607;
 	_eventContinueButton = (findDisplay 24984) displayCtrl 1606;
 	_eventDeleteButton = (findDisplay 24984) displayCtrl 1608;
 	_continueButton = (findDisplay 24984) displayCtrl 1606;
 	_trackLoadoutsButton = (findDisplay 24984) displayCtrl 1604;
 	_promoteButton = (findDisplay 24984) displayCtrl 1610;
-	_eventEditBox = (findDisplay 24984) displayCtrl 1603;
 	
 	_filterPlayersEditBox = (findDisplay 24984) displayCtrl 1400;
 	_filterPlayers = ctrlText _filterPlayersEditBox;
@@ -292,61 +260,36 @@ _answer addPublicVariableEventHandler
 	if (_statusDatabase) then {_statusDatabase = localize "STR_PPL_Main_Online"} else {_statusDatabase = localize "STR_PPL_Main_Offline"};
 	
 	_serverAndDatabaseStatusText ctrlSetText format [localize "STR_PPL_Main_Dialog_Server_Status", format ["%1 [%2]", _statusServer, _versionServer],  format ["%1 [%2]", _statusDatabase, _versionDatabase]];
-	_playersAndAdminsCountText ctrlSetText format [localize "STR_PPL_Main_Dialog_Player_Status",_countPlayersTotal , _countPlayersOnline, _countAdminsTotal, _countAdminsOnline, _countEventsTotal];
+	_playersAndAdminsCountText ctrlSetText format [localize "STR_PPL_Main_Dialog_Player_Status",_countPlayersTotal , _countPlayersOnline, _countAdminsTotal, _countAdminsOnline, _countTemplatesTotal];
 
 	if (_isAdminLoggedIn) then
 	{
 		_adminButton ctrlSetText localize "STR_PPL_Main_Dialog_Button_Logout";
-		_eventStartButton ctrlShow true;
-		_eventStopButton ctrlShow true;
+		_templatesText ctrlShow true;
+		_templatesFilterEditBox ctrlShow true;
+		_templatesListBox ctrlShow true;
+		_templateEditBox ctrlShow true;
+		_templateSaveButton ctrlShow true;
+		_templateLoadButton ctrlShow true;
 		_eventContinueButton ctrlShow true;
 		_eventDeleteButton ctrlShow true;
-		_eventEditBox ctrlShow true;
 		_continueButton ctrlShow true;
 		_promoteButton ctrlShow true;
 	}
 	else
 	{
 		_adminButton ctrlSetText localize "STR_PPL_Main_Dialog_Button_Login";
-		_eventStartButton ctrlShow false;
-		_eventStopButton ctrlShow false;
+		_templatesText ctrlShow false;
+		_templatesFilterEditBox ctrlShow false;
+		_templatesListBox ctrlShow false;
+		_templateEditBox ctrlShow false;
+		_templateSaveButton ctrlShow false;
+		_templateLoadButton ctrlShow false;
 		_eventContinueButton ctrlShow false;
 		_eventDeleteButton ctrlShow false;
-		_eventEditBox ctrlShow false;
 		_continueButton ctrlShow false;
 		_promoteButton ctrlShow false;
 	};
-
-	_noEvent = localize "STR_PPL_Main_Dialog_No_Event";
-	
-	if (PPL_isEvent) then
-	{
-		{
-			if(_x < 10) then
-			{
-				_activeEventStartTime set [_forEachIndex, format ["0%1", str _x]];
-			}
-			else
-			{
-				_activeEventStartTime set [_forEachIndex, str _x];
-			};
-		} forEach _activeEventStartTime;
-		_year = _activeEventStartTime select 0;
-		_month = _activeEventStartTime select 1;
-		_day = _activeEventStartTime select 2;
-		_hours = _activeEventStartTime select 3;
-		_minutes = _activeEventStartTime select 4;
-		_seconds = _activeEventStartTime select 5;
-		_timeZone = PPL_TimeZone;
-		if (PPL_SummerTime) then {_timeZone = _timeZone + 1;};
-		_headlineText ctrlSetBackgroundColor [0.5, 0, 0, 1];
-		_headlineText ctrlSetText format [localize "STR_PPL_Main_Dialog_Head_Time", PPL_eventName, _hours, _minutes, _seconds, _timeZone];
-	}
-	else
-	{
-		_headlineText ctrlSetBackgroundColor [0, 0.5, 0, 1];
-		_headlineText ctrlSetText format [localize "STR_PPL_Main_Dialog_Head", _noEvent];
-	};		
 
 	PPL_lbPlayersContent = [];
 
@@ -356,24 +299,13 @@ _answer addPublicVariableEventHandler
 		_dbPlayerUid = _x select 1;
 		_dbPlayerIsAdmin = _x select 2;
 		_dbPlayerIsAdminLoggedIn = _x select 3;
-		_dbPlayerIsTrackLoadoutsActive = _x select 4;
-		_dbPlayerTrackLoadoutsKey = _x select 5;
-		_dbPlayerStatus = _x select 6;
+		_dbPlayerStatus = _x select 4;
 		
 		if (_dbPlayerIsAdmin) then {_dbPlayerIsAdmin = localize "STR_PPL_Main_Admin";} else {_dbPlayerIsAdmin = localize "STR_PPL_Main_Player";};
 
 		if (_dbPlayerStatus) then {_dbPlayerStatus = " " + (localize "STR_PPL_Main_Online");} else {_dbPlayerStatus = " " + (localize "STR_PPL_Main_Offline");};
 
 		if (_dbPlayerIsAdminLoggedIn) then {_dbPlayerIsAdminLoggedIn = " " + (localize "STR_PPL_Main_Logged_In");} else {_dbPlayerIsAdminLoggedIn = "";};
-		
-		if ((_dbPlayerUid == _playerUid) && _dbPlayerIsTrackLoadoutsActive) then
-		{
-			_trackLoadoutsButton ctrlSetText localize "STR_PPL_Main_Dialog_Button_Track_Value_Off";
-		};
-		if ((_dbPlayerUid == _playerUid) && !_dbPlayerIsTrackLoadoutsActive) then
-		{
-			_trackLoadoutsButton ctrlSetText localize "STR_PPL_Main_Dialog_Button_Track_Value_On";
-		};
 		
 		_playerText = format ["%1 (%2%3%4)",_dbPlayerName, _dbPlayerIsAdmin, _dbPlayerStatus, _dbPlayerIsAdminLoggedIn];
 
@@ -398,7 +330,7 @@ _answer addPublicVariableEventHandler
 
 /* ================================================================================ */
 
-_answer = _playerUid + "-answerEventsFiltered";
+_answer = _playerUid + "-answerTemplatesFiltered";
 _answer addPublicVariableEventHandler
 {
 	params ["_broadcastVariableName", "_broadcastVariableValue", "_broadcastVariableTarget"];
@@ -407,58 +339,39 @@ _answer addPublicVariableEventHandler
 	_clientId = _broadcastVariableValue select 1;	
 	_isAdmin = _broadcastVariableValue select 2;
 	_isAdminLoggedIn = _broadcastVariableValue select 3;
-	_filteredEvents = _broadcastVariableValue select 4;
+	_filteredTemplates = _broadcastVariableValue select 4;
 	
-	_eventsListBox = (findDisplay 24984) displayCtrl 1501;
-	lbClear _eventsListBox;
-	_eventsListBox lbSetCurSel -1;
+	_templatesListBox = (findDisplay 24984) displayCtrl 1501;
+	lbClear _templatesListBox;
+	_templatesListBox lbSetCurSel -1;
 	
 	_loadoutsListBox = (findDisplay 24984) displayCtrl 1502;
 	lbClear _loadoutsListBox;
 	_loadoutsListBox lbSetCurSel -1;
 	
-	_filterEventsEditBox = (findDisplay 24984) displayCtrl 1401;
-	_filterEvents = ctrlText _filterEventsEditBox;
+	_templatesFilterEditBox = (findDisplay 24984) displayCtrl 1401;
+	_filterTemplates = ctrlText _templatesFilterEditBox;
 
-	PPL_lbEventsContent = [];
+	PPL_lbTemplatesContent = [];
 
-	_filteredEvents sort false;
+	_filteredTemplates sort false;
 	{
-		_dbEventId = _x select 0;
-		_dbEventName = _x select 1;
-		_dbEventStartTime = _x select 2;
-		_dbEventDuration = _x select 3;
+		_dbTemplateId = _x select 0;
+		_dbTemplateName = _x select 1;
 		
-		_year = str (_dbEventStartTime select 0);
-		_month = _dbEventStartTime select 1;
-		if (_month < 10) then {_month = format ["0%1", _month];} else {_month = str _month};
-		_day = _dbEventStartTime select 2;
-		if (_day < 10) then {_day = format ["0%1", _day];} else {_day = str _day};
-		
-		_eventText = format ["%1-%2-%3 %4 (%5 min.)", _year, _month, _day, _dbEventName, _dbEventDuration];
-		
-		if(PPL_isEvent && (_dbEventId == PPL_eventId)) then
-		{
-			_eventText = format [localize "STR_PPL_Main_Dialog_List_Event_Active", _eventText];
-		};
+		_templateText = format ["%1", _dbTemplateName];
 
-		if (((toLower _eventText) find (toLower _filterEvents)) > -1) then
+		if (((toLower _templateText) find (toLower _filterTemplates)) > -1) then
 		{
-			_index = _eventsListBox lbAdd _eventText;	
-			_eventsListBox lbSetData [_index, _dbEventId];
-
-			if(PPL_isEvent && (_dbEventId == PPL_eventId)) then
-			{
-				_eventsListBox lbSetColor [_index, [1, 0.5, 0.5, 1]];
-				_eventsListBox lbSetCurSel _index;
-			};
+			_index = _templatesListBox lbAdd _templateText;	
+			_templatesListBox lbSetData [_index, _dbTemplateId];
 		};	
 		
-		PPL_lbEventsContent = PPL_lbEventsContent + [[_eventText, _dbEventId]];
+		PPL_lbTemplatesContent = PPL_lbTemplatesContent + [[_templateText, _dbTemplateId]];
 	
-	} forEach _filteredEvents;
+	} forEach _filteredTemplates;
 	
-	ctrlSetFocus _eventsListBox;
+	ctrlSetFocus _templatesListBox;
 };
 
 /* ================================================================================ */
@@ -516,11 +429,6 @@ _answer addPublicVariableEventHandler
 
 /* ================================================================================ */
 
-_filterPlayersEditBox = (findDisplay 24984) displayCtrl 1400;
-_filterPlayers = ctrlText _filterPlayersEditBox;
-
-_request = _playerUid + "-requestDialogUpdate";
-missionNamespace setVariable [_request, [_playerUid, _clientId, _filterPlayers], false];
-publicVariableServer _request;
+[] call PPL_fnc_triggerServerDialogUpdate;
 
 /* ================================================================================ */

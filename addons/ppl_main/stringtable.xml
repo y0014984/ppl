@@ -84,33 +84,21 @@
 				<English>Degrade</English>
 				<German>degradieren</German>
 			</Key>
-			<Key ID="STR_PPL_Main_Dialog_Button_Continue">
-				<English>Continue</English>
-				<German>fortsetzen</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Dialog_Button_Delete">
-				<English>Delete</English>
-				<German>löschen</German>
-			</Key>
 			<Key ID="STR_PPL_Main_Dialog_Button_Template_Save">
 				<English>Save</English>
 				<German>speichern</German>
 			</Key>
-			<Key ID="STR_PPL_Main_Dialog_Button_Stop">
-				<English>Stop</English>
-				<German>stoppen</German>
+			<Key ID="STR_PPL_Main_Dialog_Button_Template_Load">
+				<English>Load</English>
+				<German>laden</German>
 			</Key>
-			<Key ID="STR_PPL_Main_Dialog_Button_Track_Value">
-				<English>Tracking</English>
-				<German>Verfolgung</German>
+			<Key ID="STR_PPL_Main_Dialog_Button_Template_Rename">
+				<English>Rename</English>
+				<German>umbenennen</German>
 			</Key>
-			<Key ID="STR_PPL_Main_Dialog_Button_Track_Value_On">
-				<English>Tracking On</English>
-				<German>Verfolgung an</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Dialog_Button_Track_Value_Off">
-				<English>Tracking Off</English>
-				<German>Verfolgung aus</German>
+			<Key ID="STR_PPL_Main_Dialog_Button_Template_Delete">
+				<English>Delete</English>
+				<German>löschen</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Dialog_Button_Update">
 				<English>Update</English>
@@ -262,10 +250,6 @@
 				<English>Persistent Player Loadout\n\nMissing template name.</English>
 				<German>Persistent Player Loadout\n\nName der Vorlage fehlt.</German>
 			</Key>
-			<Key ID="STR_PPL_Main_Notifications_No_Tracking_Value_Selected">
-				<English>Persistent Player Loadout\n\nNo value for tracking selected.</English>
-				<German>Persistent Player Loadout\n\nKein Wert zur Verfolgung ausgewählt.</German>
-			</Key>
 			<Key ID="STR_PPL_Main_Notifications_Sending_Data_Not_Allowed">
 				<English>Persistent Player Loadout\n\nSending data not allowed. See mod settings.</English>
 				<German>Persistent Player Loadout\n\nDas Senden von Daten ist deaktiviert. Schau in die Mod-Einstellungen.</German>
@@ -282,17 +266,13 @@
 				<English>Persistent Player Loadout\n\nTemplate saved: %1</English>
 				<German>Persistent Player Loadout\n\nVorlage wurde gesichert: %1</German>
 			</Key>
-			<Key ID="STR_PPL_Main_Notifications_Event_Continued">
-				<English>Persistent Player Loadout\n\nEvent Continued: %1</English>
-				<German>Persistent Player Loadout\n\nEvent wurde fortgesetzt: %1</German>
+			<Key ID="STR_PPL_Main_Notifications_Template_Renamed">
+				<English>Persistent Player Loadout\n\nTemplate renamed: %1</English>
+				<German>Persistent Player Loadout\n\nVorlage wurde umbenannt: %1</German>
 			</Key>
-			<Key ID="STR_PPL_Main_Notifications_Event_Stopped">
-				<English>Persistent Player Loadout\n\nEvent stopped: %1</English>
-				<German>Persistent Player Loadout\n\nEvent wurde beendet: %1</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Notifications_Event_Deleted">
-				<English>Persistent Player Loadout\n\nEvent deleted: %1</English>
-				<German>Persistent Player Loadout\n\nEvent wurde gelöscht: %1</German>
+			<Key ID="STR_PPL_Main_Notifications_Template_Deleted">
+				<English>Persistent Player Loadout\n\nTemplate deleted: %1</English>
+				<German>Persistent Player Loadout\n\nVorlage wurde gelöscht: %1</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Notifications_Player_Deleted">
 				<English>Persistent Player Loadout\n\nPlayer deleted: %1</English>

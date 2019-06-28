@@ -55,15 +55,15 @@ if (hasInterface ) then
 		
 		/* ---------------------------------------- */
 		
-		_filterTemplatesEditBox = _pplDialog displayCtrl 1401;
-		_filterTemplatesEditBox ctrlAddEventHandler ["SetFocus",
+		_templatesFilterEditBox = _pplDialog displayCtrl 1401;
+		_templatesFilterEditBox ctrlAddEventHandler ["SetFocus",
 		{
 			params ["_control"];
 			
 			_pplDialog = (findDisplay 24984);
 			_pplDialog displayRemoveAllEventHandlers "KeyUp";
 		}];
-		_filterTemplatesEditBox ctrlAddEventHandler ["KillFocus",
+		_templatesFilterEditBox ctrlAddEventHandler ["KillFocus",
 		{
 			params ["_control"];
 			

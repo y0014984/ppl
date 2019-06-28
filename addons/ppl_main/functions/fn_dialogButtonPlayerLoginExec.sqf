@@ -24,8 +24,6 @@ _answer addPublicVariableEventHandler
 {
 	params ["_broadcastVariableName", "_broadcastVariableValue", "_broadcastVariableTarget"];
 
-	//[] call PPL_fnc_dialogUpdate;
-	
 	[] call PPL_fnc_triggerServerDialogUpdate;
 };
 

@@ -184,12 +184,14 @@ params ["_playerUid"];
 
 /* ================================================================================ */
 
-(_playerUid + "-requestStopEvent") addPublicVariableEventHandler
+(_playerUid + "-requestTemplateLoad") addPublicVariableEventHandler
 {
 	params ["_broadcastVariableName", "_broadcastVariableValue", "_broadcastVariableTarget"];
 
 	_playerUid = _broadcastVariableValue select 0;
 	_clientId = _broadcastVariableValue select 1;
+	_requestedPlayerUid = _broadcastVariableValue select 2;
+	_requestedTemplateId = _broadcastVariableValue select 3;
 
 	_dbName = "ppl-players";
 	_dbPlayers = ["new", _dbName] call OO_INIDBI;
@@ -198,50 +200,33 @@ params ["_playerUid"];
 	_isAdmin = ["read", [_playerUid, "isAdmin", false]] call _dbPlayers;
 	_isAdminLoggedIn = ["read", [_playerUid, "isAdminLoggedIn", false]] call _dbPlayers;
 	
-	if (_isAdmin && _isAdminLoggedIn) then
+	if ((_playerUid == _requestedPlayerUid) || (_isAdmin && _isAdminLoggedIn)) then
 	{		
-		_dbName = "ppl-events";
-		_dbEvents = ["new", _dbName] call OO_INIDBI;
+		_dbName = "ppl-templates";
+		_dbTemplates = ["new", _dbName] call OO_INIDBI;
 		
-		if (PPL_isEvent) then
+		_templateLoadout = ["read", [_requestedTemplateId, "templateLoadout", []]] call _dbTemplates;
+		_templateName = ["read", [_requestedTemplateId, "templateName", ""]] call _dbTemplates;
+		
+		_allPlayerObj = allPlayers;
 		{
-			_eventStopTime = "getTimeStamp" call _dbEvents;
-
-			PPL_eventStopTime = +_eventStopTime;
-			publicVariable "PPL_eventStopTime";
-			PPL_isEvent = false;
-			publicVariable "PPL_isEvent";
+			_tmpPlayerUid = getPlayerUID _x;
 			
-			["write", [PPL_eventId, "eventStopTime", PPL_eventStopTime]] call _dbEvents;
+			//hint format ["%1\n\n%2\n\n%3\n\n%4\n\n%5\n\n%6", _requestedTemplateId, _templateLoadout, _templateName, _playerUid, _requestedPlayerUid, _tmpPlayerUid];
 			
-			if ((PPL_eventStopTime select 0) == (PPL_eventStartTime select 0)) then
+			if ((_tmpPlayerUid == _requestedPlayerUid) && (!(_templateLoadout isEqualTo []))) then
 			{
-				_tmpEventStartTime = +PPL_eventStartTime;
-				_tmpEventStartTime set [5, "delete"];
-				_tmpEventStartTime = _tmpEventStartTime - ["delete"];
-				_tmpEventStopTime = +PPL_eventStopTime;
-				_tmpEventStopTime set [5, "delete"];
-				_tmpEventStopTime = _tmpEventStopTime - ["delete"];
-				_eventDuration = (dateToNumber _tmpEventStopTime) - (dateToNumber _tmpEventStartTime);
-				_eventDuration = numberToDate [_tmpEventStopTime select 0, _eventDuration];
-				if (((_eventDuration select 1) == 1) && ((_eventDuration select 2) == 1)) then
-				{
-					_eventDurationOld = ["read", [PPL_eventId, "eventDuration", 0]] call _dbEvents;
-					_eventDuration = _eventDurationOld + (((_eventDuration select 3) * 60) + (_eventDuration select 4));
-					["write", [PPL_eventId, "eventDuration", _eventDuration]] call _dbEvents;
-				};
+				_x setUnitLoadout [_templateLoadout, false];
 			};
-			
-			["STR_PPL_Main_Notifications_Event_Stopped", PPL_eventName] remoteExecCall ["PPL_fnc_hintLocalized"];
-		};
-			
+		} forEach _allPlayerObj;
+
 		_result = true;
 		
-		_answer = _playerUid + "-answerStopEvent";
+		_answer = _playerUid + "-answerTemplateLoad";
 		missionNamespace setVariable [_answer, _result, false];
 		_clientId publicVariableClient _answer;
 		
-		[format ["[%1] PPL Player Request Stop Event: %2 (%3)", serverTime, PPL_eventName, _playerUid]] call PPL_fnc_log;
+		[format ["[%1] PPL Player Request Template Load: %2 - %3 (%4)", serverTime, _templateName, _requestedPlayerUid, _playerUid]] call PPL_fnc_log;
 	};
 };
 
@@ -416,118 +401,83 @@ params ["_playerUid"];
 
 /* ================================================================================ */
 
-(_playerUid + "-requestDeleteEvent") addPublicVariableEventHandler
+(_playerUid + "-requestTemplateRename") addPublicVariableEventHandler
 {
 	params ["_broadcastVariableName", "_broadcastVariableValue", "_broadcastVariableTarget"];
 
 	_playerUid = _broadcastVariableValue select 0;
 	_clientId = _broadcastVariableValue select 1;
-	_eventId = _broadcastVariableValue select 2;
-
-	_dbName = "ppl-players";
-	_dbPlayers = ["new", _dbName] call OO_INIDBI;
+	_requestedTemplateId = _broadcastVariableValue select 2;
+	_requestedTemplateName = _broadcastVariableValue select 3;
 	
-	_isAdmin = ["read", [_playerUid, "isAdmin", false]] call _dbPlayers;
-	_isAdminLoggedIn = ["read", [_playerUid, "isAdminLoggedIn", false]] call _dbPlayers;
-		
-	_dbName = "ppl-events";
-	_dbEvents = ["new", _dbName] call OO_INIDBI;
-	
-	if ("exists" call _dbEvents) then
-	{
-		_eventName = ["read", [_eventId, "eventName", ""]] call _dbEvents;
-		_eventPlayerUids = ["read", [_eventId, "eventPlayerUids", ""]] call _dbEvents;
-		
-		if (_isAdmin && _isAdminLoggedIn) then
-		{
-			{
-				_dbName = "ppl-loadouts-" + _x + "-" + _eventId;
-				_dbLoadouts = ["new", _dbName] call OO_INIDBI;
-				
-				if ("exists" call _dbLoadouts) then {"delete" call _dbLoadouts;};
-			} forEach _eventPlayerUids;
-			
-			["deleteSection", _eventId] call _dbEvents;
-		} 
-		else 
-		{
-			/*this code can't be reached because the delete button is invisible for non admin players*/
-			_dbName = "ppl-loadouts-" + _playerUid + "-" + _eventId;
-			_dbLoadouts = ["new", _dbName] call OO_INIDBI;
-			
-			if ("exists" call _dbLoadouts) then {"delete" call _dbLoadouts;};
-			
-			_eventPlayerUidsWithoutPlayer = [];
-			{
-				if (_x != _playerUid) then {_eventPlayerUidsWithoutPlayer = _eventPlayerUidsWithoutPlayer + [_x]};
-			} forEach _eventPlayerUids;
-			["write", [_eventId, "eventPlayerUids", _eventPlayerUidsWithoutPlayer]] call _dbEvents;
-		};
-		
-		["STR_PPL_Main_Notifications_Event_Deleted", _eventName] remoteExecCall ["PPL_fnc_hintLocalized"];
-	};
-		
-	_result = true;
-	
-	_answer = _playerUid + "-answerDeleteEvent";
-	missionNamespace setVariable [_answer, _result, false];
-	_clientId publicVariableClient _answer;
-	
-	[format ["[%1] PPL Player Request Delete Event: %2 (%3)", serverTime, PPL_eventName, _playerUid]] call PPL_fnc_log;
-};
-
-/* ================================================================================ */
-
-(_playerUid + "-requestContinueEvent") addPublicVariableEventHandler
-{
-	params ["_broadcastVariableName", "_broadcastVariableValue", "_broadcastVariableTarget"];
-
-	_playerUid = _broadcastVariableValue select 0;
-	_clientId = _broadcastVariableValue select 1;
-	_eventId = _broadcastVariableValue select 2;
-
 	_dbName = "ppl-players";
 	_dbPlayers = ["new", _dbName] call OO_INIDBI;
 	
 	_isAdmin = ["read", [_playerUid, "isAdmin", false]] call _dbPlayers;
 	_isAdminLoggedIn = ["read", [_playerUid, "isAdminLoggedIn", false]] call _dbPlayers;
 	
-	if (_isAdmin && _isAdminLoggedIn && !PPL_isEvent) then
+	if (_isAdmin && _isAdminLoggedIn) then
 	{		
-		_dbName = "ppl-events";
-		_dbEvents = ["new", _dbName] call OO_INIDBI;
+		_dbName = "ppl-templates";
+		_dbTemplates = ["new", _dbName] call OO_INIDBI;
 		
-		if ("exists" call _dbEvents) then
+		if ("exists" call _dbTemplates) then
 		{
-			_eventName = ["read", [_eventId, "eventName", ""]] call _dbEvents;
+			["write", [_requestedTemplateId, "templateName", _requestedTemplateName]] call _dbTemplates;
 			
-			_eventStartTime = "getTimeStamp" call _dbEvents;
-			_eventStopTime = [0, 0, 0, 0, 0, 0];
-			["write", [_eventId, "eventStartTime", _eventStartTime]] call _dbEvents;
-			["write", [_eventId, "eventStopTime", _eventStopTime]] call _dbEvents;
-			
-			PPL_isEvent = true;
-			publicVariable "PPL_isEvent";
-			PPL_eventName = _eventName;
-			publicVariable "PPL_eventName";
-			PPL_eventId = _eventId;
-			publicVariable "PPL_eventId";
-			PPL_eventStartTime = +_eventStartTime;
-			publicVariable "PPL_eventStartTime";
-			PPL_eventStopTime = +_eventStopTime;
-			publicVariable "PPL_eventStopTime";
-			
-			["STR_PPL_Main_Notifications_Event_Continued", _eventName] remoteExecCall ["PPL_fnc_hintLocalized"];
+			["STR_PPL_Main_Notifications_Template_Renamed", _requestedTemplateName] remoteExecCall ["PPL_fnc_hintLocalized"];
 		};
 			
 		_result = true;
 		
-		_answer = _playerUid + "-answerContinueEvent";
+		_answer = _playerUid + "-answerTemplateRename";
 		missionNamespace setVariable [_answer, _result, false];
 		_clientId publicVariableClient _answer;
 		
-		[format ["[%1] PPL Player Request Continue Event: %2 (%3)", serverTime, PPL_eventName, _playerUid]] call PPL_fnc_log;
+		[format ["[%1] PPL Player Request Template Rename: %2 (%3)", serverTime, _requestedTemplateName, _playerUid]] call PPL_fnc_log;
 	};
+};
+
+/* ================================================================================ */
+
+(_playerUid + "-requestTemplateDelete") addPublicVariableEventHandler
+{
+	params ["_broadcastVariableName", "_broadcastVariableValue", "_broadcastVariableTarget"];
+
+	_playerUid = _broadcastVariableValue select 0;
+	_clientId = _broadcastVariableValue select 1;
+	_requestedTemplateId = _broadcastVariableValue select 2;
+
+	_dbName = "ppl-players";
+	_dbPlayers = ["new", _dbName] call OO_INIDBI;
+	
+	_isAdmin = ["read", [_playerUid, "isAdmin", false]] call _dbPlayers;
+	_isAdminLoggedIn = ["read", [_playerUid, "isAdminLoggedIn", false]] call _dbPlayers;
+		
+	_dbName = "ppl-templates";
+	_dbTemplates = ["new", _dbName] call OO_INIDBI;
+	
+	_templateName = "";
+	
+	if ("exists" call _dbTemplates) then
+	{
+		if (_isAdmin && _isAdminLoggedIn) then
+		{
+			_templateName = ["read", [_requestedTemplateId, "templateName", ""]] call _dbTemplates;
+			
+			["deleteSection", _requestedTemplateId] call _dbTemplates;
+			
+			["STR_PPL_Main_Notifications_Template_Deleted", _templateName] remoteExecCall ["PPL_fnc_hintLocalized"];
+		};
+	};
+		
+	_result = true;
+	
+	_answer = _playerUid + "-answerTemplateDelete";
+	missionNamespace setVariable [_answer, _result, false];
+	_clientId publicVariableClient _answer;
+	
+	[format ["[%1] PPL Player Request Template Delete : %2 (%3)", serverTime, _templateName, _playerUid]] call PPL_fnc_log;
 };
 
 /* ================================================================================ */
@@ -726,14 +676,13 @@ params ["_playerUid"];
 
 /* ================================================================================ */
 
-(_playerUid + "-requestEventsFiltered") addPublicVariableEventHandler
+(_playerUid + "-requestTemplatesFiltered") addPublicVariableEventHandler
 {
 	params ["_broadcastVariableName", "_broadcastVariableValue", "_broadcastVariableTarget"];
 	
 	_playerUid = _broadcastVariableValue select 0;
 	_clientId = _broadcastVariableValue select 1;
-	_requestedPlayerUid = _broadcastVariableValue select 2;
-	_filterEvents = _broadcastVariableValue select 3;
+	_filterTemplates = _broadcastVariableValue select 2;
 
 	/* ---------------------------------------- */
 
@@ -745,39 +694,33 @@ params ["_playerUid"];
 
 	/* ---------------------------------------- */
 
-	if (_requestedPlayerUid != _playerUid && !_isAdmin) exitWith {};
+	_dbName = "ppl-templates";
+	_dbTemplates = ["new", _dbName] call OO_INIDBI;
 	
-	_dbName = "ppl-events";
-	_dbEvents = ["new", _dbName] call OO_INIDBI;
-	
-	_filteredEvents = [];
-	if ("exists" call _dbEvents) then
+	_filteredTemplates = [];
+	if ("exists" call _dbTemplates) then
 	{
-		_events = "getSections" call _dbEvents;
+		_templates = "getSections" call _dbTemplates;
 		{	
-			_eventPlayerUids = ["read", [_x, "eventPlayerUids", 0]] call _dbEvents;
+			_templateId = ["read", [_x, "templateId", 0]] call _dbTemplates;
+			_templateName = ["read", [_x, "templateName", ""]] call _dbTemplates;
 			
-			_eventId = ["read", [_x, "eventId", 0]] call _dbEvents;
-			_eventName = ["read", [_x, "eventName", ""]] call _dbEvents;
-			_eventDuration = ["read", [_x, "eventDuration", 0]] call _dbEvents;
-			_eventStartTime = ["read", [_x, "eventStartTime", [0, 0, 0, 0, 0, 0]]] call _dbEvents;
-			
-			if (((_eventPlayerUids find _requestedPlayerUid) > -1) && ((((toLower _eventName) find (toLower _filterEvents)) > -1) || (_filterEvents == ""))) then
+			if ((((toLower _templateName) find (toLower _filterTemplates)) > -1) || (_filterTemplates == "")) then
 			{
-				_filteredEvents = _filteredEvents + [[_eventId, _eventName, _eventStartTime, _eventDuration]];
+				_filteredTemplates = _filteredTemplates + [[_templateId, _templateName]];
 			};
-		} forEach _events;
+		} forEach _templates;
 	};
 
 	/* ---------------------------------------- */
 
-	_result = [_playerUid, _clientId, _isAdmin, _isAdminLoggedIn, _filteredEvents];
+	_result = [_playerUid, _clientId, _isAdmin, _isAdminLoggedIn, _filteredTemplates];
 	
-	_answer = _playerUid + "-answerEventsFiltered";
+	_answer = _playerUid + "-answerTemplatesFiltered";
 	missionNamespace setVariable [_answer, _result, false];
 	_clientId publicVariableClient _answer;
 
-	[format ["[%1] PPL Player Request Events Filtered: (%2)", serverTime, _playerUid]] call PPL_fnc_log;
+	[format ["[%1] PPL Player Request Templates Filtered: (%2)", serverTime, _playerUid]] call PPL_fnc_log;
 };
 
 /* ================================================================================ */
@@ -855,10 +798,10 @@ params ["_playerUid"];
 	
 	/* ---------------------------------------- */
 
-	_dbName = "ppl-events";
-	_dbEvents = ["new", _dbName] call OO_INIDBI;
-	_events = "getSections" call _dbEvents;
-	_countEventsTotal = count _events;
+	_dbName = "ppl-templates";
+	_dbTemplates = ["new", _dbName] call OO_INIDBI;
+	_templates = "getSections" call _dbTemplates;
+	_countTemplatesTotal = count _templates;
 
 	/* ---------------------------------------- */
 
@@ -876,16 +819,13 @@ params ["_playerUid"];
 		if (_tmpIsAdmin) then {_countAdminsTotal = _countAdminsTotal + 1};
 		_tmpIsAdminLoggedIn = ["read", [_x, "isAdminLoggedIn", false]] call _dbPlayers;
 		
-		_tmpPlayerIsTrackLoadoutsActive = ["read", [_x, "isTrackLoadoutsActive", false]] call _dbPlayers;
-		_tmpPlayerTrackLoadoutsKey = ["read", [_x, "trackLoadoutsKey", ""]] call _dbPlayers;
-
 		_tmpPlayerStatus = false;
 		if ((_allActivePlayersIds find _tmpPlayerUid) > -1) then {_tmpPlayerStatus = true;};
 		
-		_tmpResult = _tmpResult + [[_tmpPlayerName, _tmpPlayerUid, _tmpIsAdmin, _tmpIsAdminLoggedIn, _tmpPlayerIsTrackLoadoutsActive, _tmpPlayerTrackLoadoutsKey, _tmpPlayerStatus]];
+		_tmpResult = _tmpResult + [[_tmpPlayerName, _tmpPlayerUid, _tmpIsAdmin, _tmpIsAdminLoggedIn, _tmpPlayerStatus]];
 		if (_tmpPlayerUid == _playerUid) then
 		{
-			_playerOnly = [[_tmpPlayerName, _tmpPlayerUid, _tmpIsAdmin, _tmpIsAdminLoggedIn, _tmpPlayerIsTrackLoadoutsActive, _tmpPlayerTrackLoadoutsKey, _tmpPlayerStatus]];
+			_playerOnly = [[_tmpPlayerName, _tmpPlayerUid, _tmpIsAdmin, _tmpIsAdminLoggedIn, _tmpPlayerStatus]];
 		};
 	} forEach _players;
 	
@@ -911,7 +851,7 @@ params ["_playerUid"];
 	_result =
 	[
 		_playerUid, _clientId, _isAdmin, _isAdminLoggedIn,  
-		_countPlayersTotal, _countPlayersOnline, _countAdminsTotal, _countAdminsOnline, _countEventsTotal, 
+		_countPlayersTotal, _countPlayersOnline, _countAdminsTotal, _countAdminsOnline, _countTemplatesTotal, 
 		_filteredPlayers
 	];
 	

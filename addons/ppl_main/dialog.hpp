@@ -157,17 +157,6 @@ class PPL_Main_Dialog
 			
 			action = "[] call PPL_fnc_dialogButtonPlayerPromoteExec;";
 		};
-		class PPL_RscButton_1609: RscButton
-		{
-			idc = 1609;
-			text = $STR_PPL_Main_Dialog_Button_Delete;
-			x = 0 * GUI_GRID_W + GUI_GRID_X;
-			y = 12.5 * GUI_GRID_H + GUI_GRID_Y;
-			w = 6 * GUI_GRID_W;
-			h = 1 * GUI_GRID_H;
-			
-			action = "[] call PPL_fnc_dialogButtonPlayerDeleteExec;";
-		};
 		class PPL_RscButton_1602: RscButton
 		{
 			idc = 1602;
@@ -179,38 +168,38 @@ class PPL_Main_Dialog
 			
 			action = "[] call PPL_fnc_dialogButtonTemplateSaveExec;";
 		};
-		class PPL_RscButton_1606: RscButton
-		{
-			idc = 1606;
-			text = $STR_PPL_Main_Dialog_Button_Continue;
-			x = 6.5 * GUI_GRID_W + GUI_GRID_X;
-			y = 24 * GUI_GRID_H + GUI_GRID_Y;
-			w = 6 * GUI_GRID_W;
-			h = 1 * GUI_GRID_H;
-			
-			action = "[] call PPL_fnc_dialogButtonEventContinueExec;";
-		};	
 		class RscButton_1607: RscButton
 		{
 			idc = 1607;
-			text = $STR_PPL_Main_Dialog_Button_Stop;
+			text = $STR_PPL_Main_Dialog_Button_Template_Load;
 			x = 0 * GUI_GRID_W + GUI_GRID_X;
 			y = 24 * GUI_GRID_H + GUI_GRID_Y;
 			w = 6 * GUI_GRID_W;
 			h = 1 * GUI_GRID_H;
 
-			action = "[] call PPL_fnc_dialogButtonEventStopExec;";
+			action = "[] call PPL_fnc_dialogButtonTemplateLoadExec;";
+		};
+		class PPL_RscButton_1606: RscButton
+		{
+			idc = 1606;
+			text = $STR_PPL_Main_Dialog_Button_Template_Rename;
+			x = 6.5 * GUI_GRID_W + GUI_GRID_X;
+			y = 24 * GUI_GRID_H + GUI_GRID_Y;
+			w = 6 * GUI_GRID_W;
+			h = 1 * GUI_GRID_H;
+			
+			action = "[] call PPL_fnc_dialogButtonTemplateRenameExec;";
 		};
 		class RscButton_1608: RscButton
 		{
 			idc = 1608;
-			text = $STR_PPL_Main_Dialog_Button_Delete;
+			text = $STR_PPL_Main_Dialog_Button_Template_Delete;
 			x = 13 * GUI_GRID_W + GUI_GRID_X;
 			y = 24 * GUI_GRID_H + GUI_GRID_Y;
 			w = 6 * GUI_GRID_W;
 			h = 1 * GUI_GRID_H;
 			
-			action = "[] call PPL_fnc_dialogButtonEventDeleteExec;";
+			action = "[] call PPL_fnc_dialogButtonTemplateDeleteExec;";
 		};		
 		class PPL_RscEdit_1603: RscEdit
 		{
