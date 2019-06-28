@@ -160,10 +160,21 @@ if (hasInterface ) then
 			
 			_loadoutsListBox = (findDisplay 24984) displayCtrl 1502;
 			_selectedLoadoutIndex = lbCurSel _loadoutsListBox;
-			_requestedLoutoutId = _loadoutsListBox lbData _selectedLoadoutIndex;
+			_requestedLoadoutId = _loadoutsListBox lbData _selectedLoadoutIndex;
+			
+			_templatesListBox = (findDisplay 24984) displayCtrl 1501;
+			_selectedTemplateIndex = lbCurSel _templatesListBox;
+			_requestedTemplateId = _templatesListBox lbData _selectedTemplateIndex;
+			
+			_playersListBox = (findDisplay 24984) displayCtrl 1500;
+			_selectedPlayerIndex = lbCurSel _playersListBox;
+			_requestedPlayerUid = _playersListBox lbData _selectedPlayerIndex;
+
+			
+			
 			
 			_request = _playerUid + "-requestDetails";
-			missionNamespace setVariable [_request, [_playerUid, _clientId, _dataType, _requestedLoutoutId], false];
+			missionNamespace setVariable [_request, [_playerUid, _clientId, _dataType, [_requestedLoadoutId, _requestedTemplateId, _requestedPlayerUid]], false];
 			publicVariableServer _request;
 		}];
 

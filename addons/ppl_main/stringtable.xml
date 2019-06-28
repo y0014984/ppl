@@ -112,10 +112,6 @@
 				<English>Close</English>
 				<German>schließen</German>
 			</Key>
-			<Key ID="STR_PPL_Main_Dialog_List_Value_Not_Recorded">
-				<English>Value: %1 not recorded yet</English>
-				<German>Wert: %1 bisher nicht aufgezeichnet</German>
-			</Key>
 		</Container>
 		<Container name="Keybinds">
 			<Key ID="STR_PPL_Main_Keybinds_Category">

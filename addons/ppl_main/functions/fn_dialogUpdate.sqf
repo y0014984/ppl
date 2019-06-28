@@ -27,17 +27,36 @@ _playersListBox ctrlAddEventHandler ["LBSelChanged",
 
 	if (_selectedIndex != -1) then
 	{
-		_text = _control lbText _selectedIndex;
+		_templatesListBox = (findDisplay 24984) displayCtrl 1501;
+		_selectedTemplateIndex = lbCurSel _templatesListBox;
 		
-		_promoteButton = (findDisplay 24984) displayCtrl 1610;
+		if (_selectedTemplateIndex != -1) then
+		{
+			_requestedTemplateId = _templatesListBox lbData _selectedTemplateIndex;
+			
+			_requestedPlayerUid = _control lbData _selectedIndex;
+			
+			_playerUid = getPlayerUID player;
+			_clientId = clientOwner;
+			
+			_text = _control lbText _selectedIndex;
+			
+			_promoteButton = (findDisplay 24984) displayCtrl 1610;
 
-		if ((_text find (localize "STR_PPL_Main_Admin")) > -1) then
-		{
-			_promoteButton ctrlSetText localize "STR_PPL_Main_Dialog_Button_Degrade";
-		}
-		else
-		{
-			_promoteButton ctrlSetText localize "STR_PPL_Main_Dialog_Button_Promote";
+			if ((_text find (localize "STR_PPL_Main_Admin")) > -1) then
+			{
+				_promoteButton ctrlSetText localize "STR_PPL_Main_Dialog_Button_Degrade";
+			}
+			else
+			{
+				_promoteButton ctrlSetText localize "STR_PPL_Main_Dialog_Button_Promote";
+			};
+
+			_filterLoadouts = "";
+		
+			_request = _playerUid + "-requestLoadoutsFiltered";
+			missionNamespace setVariable [_request, [_playerUid, _clientId, _requestedPlayerUid, _requestedTemplateId, _filterLoadouts], false];
+			publicVariableServer _request;
 		};
 	};
 }];
@@ -53,18 +72,22 @@ _templatesListBox ctrlAddEventHandler ["LBSelChanged",
 	{
 		_playersListBox = (findDisplay 24984) displayCtrl 1500;
 		_selectedPlayerIndex = lbCurSel _playersListBox;
-		_requestedPlayerUid = _playersListBox lbData _selectedPlayerIndex;
 		
-		_requestedTemplateId = _control lbData _selectedIndex;
+		if (_selectedPlayerIndex != -1) then
+		{
+			_requestedPlayerUid = _playersListBox lbData _selectedPlayerIndex;
+			
+			_requestedTemplateId = _control lbData _selectedIndex;
+			
+			_playerUid = getPlayerUID player;
+			_clientId = clientOwner;
+			
+			_filterLoadouts = "";
 		
-		_playerUid = getPlayerUID player;
-		_clientId = clientOwner;
-		
-		_filterLoadouts = "";
-	
-		_request = _playerUid + "-requestLoadoutsFiltered";
-		missionNamespace setVariable [_request, [_playerUid, _clientId, _requestedPlayerUid, _requestedTemplateId, _filterLoadouts], false];
-		publicVariableServer _request;
+			_request = _playerUid + "-requestLoadoutsFiltered";
+			missionNamespace setVariable [_request, [_playerUid, _clientId, _requestedPlayerUid, _requestedTemplateId, _filterLoadouts], false];
+			publicVariableServer _request;
+		};
 	};
 }];
 
@@ -75,20 +98,9 @@ _loadoutsListBox ctrlAddEventHandler ["LBSelChanged",
 {
 	params ["_control", "_selectedIndex"];
 
-	if (PPL_isTrackLoadoutsActive && (_selectedIndex != -1)) then
+	if (_selectedIndex != -1) then
 	{
-		_loadoutsListBox = (findDisplay 24984) displayCtrl 1502;
-		_loadoutsKey = _loadoutsListBox lbData _selectedIndex;
-		_trackLoadoutsButton = (findDisplay 24984) displayCtrl 1604;
-		
-		if (PPL_trackLoadoutsKey == _loadoutsKey) then
-		{
-			_trackLoadoutsButton ctrlSetText localize "STR_PPL_Main_Dialog_Button_Track_Value_Off";
-		}
-		else
-		{
-			_trackLoadoutsButton ctrlSetText localize "STR_PPL_Main_Dialog_Button_Track_Value_On";
-		};
+		// ???
 	};
 }];
 
@@ -247,10 +259,8 @@ _answer addPublicVariableEventHandler
 	_templateEditBox = (findDisplay 24984) displayCtrl 1603;
 	_templateSaveButton = (findDisplay 24984) displayCtrl 1602;
 	_templateLoadButton = (findDisplay 24984) displayCtrl 1607;
-	_eventContinueButton = (findDisplay 24984) displayCtrl 1606;
-	_eventDeleteButton = (findDisplay 24984) displayCtrl 1608;
-	_continueButton = (findDisplay 24984) displayCtrl 1606;
-	_trackLoadoutsButton = (findDisplay 24984) displayCtrl 1604;
+	_templateRenameButton = (findDisplay 24984) displayCtrl 1606;
+	_templateDeleteButton = (findDisplay 24984) displayCtrl 1608;
 	_promoteButton = (findDisplay 24984) displayCtrl 1610;
 	
 	_filterPlayersEditBox = (findDisplay 24984) displayCtrl 1400;
@@ -271,9 +281,8 @@ _answer addPublicVariableEventHandler
 		_templateEditBox ctrlShow true;
 		_templateSaveButton ctrlShow true;
 		_templateLoadButton ctrlShow true;
-		_eventContinueButton ctrlShow true;
-		_eventDeleteButton ctrlShow true;
-		_continueButton ctrlShow true;
+		_templateRenameButton ctrlShow true;
+		_templateDeleteButton ctrlShow true;
 		_promoteButton ctrlShow true;
 	}
 	else
@@ -285,9 +294,8 @@ _answer addPublicVariableEventHandler
 		_templateEditBox ctrlShow false;
 		_templateSaveButton ctrlShow false;
 		_templateLoadButton ctrlShow false;
-		_eventContinueButton ctrlShow false;
-		_eventDeleteButton ctrlShow false;
-		_continueButton ctrlShow false;
+		_templateRenameButton ctrlShow false;
+		_templateDeleteButton ctrlShow false;
 		_promoteButton ctrlShow false;
 	};
 
@@ -309,7 +317,7 @@ _answer addPublicVariableEventHandler
 		
 		_playerText = format ["%1 (%2%3%4)",_dbPlayerName, _dbPlayerIsAdmin, _dbPlayerStatus, _dbPlayerIsAdminLoggedIn];
 
-		if (((toLower _playerText) find (toLower _filterPlayers)) > -1) then
+		if ((((toLower _playerText) find (toLower _filterPlayers)) > -1) || (_filterPlayers == "")) then
 		{
 			_index = _playersListBox lbAdd _playerText;	
 			_playersListBox lbSetData [_index, _dbPlayerUid];
@@ -345,23 +353,19 @@ _answer addPublicVariableEventHandler
 	lbClear _templatesListBox;
 	_templatesListBox lbSetCurSel -1;
 	
-	_loadoutsListBox = (findDisplay 24984) displayCtrl 1502;
-	lbClear _loadoutsListBox;
-	_loadoutsListBox lbSetCurSel -1;
-	
 	_templatesFilterEditBox = (findDisplay 24984) displayCtrl 1401;
 	_filterTemplates = ctrlText _templatesFilterEditBox;
 
 	PPL_lbTemplatesContent = [];
 
-	_filteredTemplates sort false;
+	_filteredTemplates sort true;
 	{
 		_dbTemplateId = _x select 0;
 		_dbTemplateName = _x select 1;
 		
 		_templateText = format ["%1", _dbTemplateName];
 
-		if (((toLower _templateText) find (toLower _filterTemplates)) > -1) then
+		if ((((toLower _templateText) find (toLower _filterTemplates)) > -1) || (_filterTemplates == "")) then
 		{
 			_index = _templatesListBox lbAdd _templateText;	
 			_templatesListBox lbSetData [_index, _dbTemplateId];
@@ -381,9 +385,11 @@ _answer addPublicVariableEventHandler
 {
 	params ["_broadcastVariableName", "_broadcastVariableValue", "_broadcastVariableTarget"];
 	
-	_playerLoadouts = _broadcastVariableValue select 0;
-	_isTrackLoadoutsActive = _broadcastVariableValue select 1;
-	_trackLoadoutsKey = _broadcastVariableValue select 2;
+	_playerUid = _broadcastVariableValue select 0;
+	_clientId = _broadcastVariableValue select 1;	
+	_isAdmin = _broadcastVariableValue select 2;
+	_isAdminLoggedIn = _broadcastVariableValue select 3;
+	_filteredLoadouts = _broadcastVariableValue select 4;
 
 	_loadoutsListBox = (findDisplay 24984) displayCtrl 1502;
 	lbClear _loadoutsListBox;
@@ -394,37 +400,32 @@ _answer addPublicVariableEventHandler
 	
 	PPL_lbLoadoutsContent = [];
 	
-	_playerLoadouts sort true;
+	_filteredLoadouts sort false;
 	{
-		_key = _x select 0;
-		_formatString = _x select 1;
-		_source = _x select 2;
-		_valueOne = _x select 3;
-		_valueTwo = _x select 4;
-		_valueThree = _x select 5;
+		_dbSetupTimeStamp = _x select 0;
+		_dbLoadoutId = _x select 1;
+		_dbSetupLoadoutName = _x select 2;
 		
-		_loadoutsText = (format ["[%1]", _source]) + " " + (format [(localize _formatString), _valueOne, _valueTwo, _valueThree]);
+		_year = _dbSetupTimeStamp select 0;
+		if (_year < 10) then {_year = format ["0%1", str _year];} else {_year = str _year;};
+		_month = _dbSetupTimeStamp select 1;
+		if (_month < 10) then {_month = format ["0%1", str _month];} else {_month = str _month;};
+		_day = _dbSetupTimeStamp select 2;
+		if (_day < 10) then {_day = format ["0%1", str _day];} else {_day = str _day;};
 		
-		if ((PPL_isTrackLoadoutsActive) && (PPL_trackLoadoutsKey == _key)) then
+		_dateString = format ["%1-%2-%3", _year, _month, _day];	
+		
+		_loadoutText = _dateString + " " + _dbSetupLoadoutName;
+		
+		if ((((toLower _loadoutText) find (toLower _filterLoadouts)) > -1) || (_filterLoadouts == "")) then
 		{
-			_loadoutsText = format [localize "STR_PPL_Main_Dialog_List_Tracking_Active", _loadoutsText];
+			_index = _loadoutsListBox lbAdd _loadoutText;
+			_loadoutsListBox lbSetData [_index, _dbLoadoutId];
 		};
 		
-		if (((toLower _loadoutsText) find (toLower _filterLoadouts)) > -1) then
-		{
-			_index = _loadoutsListBox lbAdd _loadoutsText;
-			_loadoutsListBox lbSetData [_index, _key];
-			
-			if ((PPL_isTrackLoadoutsActive) && (PPL_trackLoadoutsKey == _key)) then
-			{		
-				_loadoutsListBox lbSetColor [_index, [1, 0.5, 0.5, 1]];
-				_loadoutsListBox lbSetCurSel _index;
-			};
-		};
+		PPL_lbLoadoutsContent = PPL_lbLoadoutsContent + [[_loadoutText, _dbLoadoutId]];
 		
-		PPL_lbLoadoutsContent = PPL_lbLoadoutsContent + [[_loadoutsText, _key]];
-		
-	} forEach _playerLoadouts;
+	} forEach _filteredLoadouts;
 };
 
 /* ================================================================================ */

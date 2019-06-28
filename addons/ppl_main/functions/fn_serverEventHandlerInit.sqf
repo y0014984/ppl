@@ -97,7 +97,16 @@ params ["_playerUid"];
 	{
 		case "player":{_dbName = "ppl-players";};
 		case "template":{_dbName = "ppl-templates";};
-		case "loadout":{_dbName = "ppl-loadouts";};
+		case "loadout":
+		{
+			_requestedLoadoutId = _section select 0;
+			_requestedTemplateId = _section select 1;
+			_requestedPlayerUid = _section select 2;
+			
+			_section = _requestedLoadoutId;
+			
+			_dbName = "ppl-loadouts-" + _requestedTemplateId + "-" + _requestedPlayerUid;
+		};
 	};
 	
 	_db = ["new", _dbName] call OO_INIDBI;
@@ -114,72 +123,6 @@ params ["_playerUid"];
 	["STR_PPL_Main_Notifications_Details", _details] remoteExecCall ["PPL_fnc_hintLocalized", _clientId];
 	
 	[format ["[%1] PPL Player Request Details: %2 - %3 (%4)", serverTime, _dataType, _section, _playerUid]] call PPL_fnc_log;
-};
-
-/* ================================================================================ */
-
-(_playerUid + "-requestSwitchTrackLoadouts") addPublicVariableEventHandler
-{
-	params ["_broadcastVariableName", "_broadcastVariableValue", "_broadcastVariableTarget"];
-
-	_playerUid = _broadcastVariableValue select 0;
-	_clientId = _broadcastVariableValue select 1;
-	_key = _broadcastVariableValue select 2;
-	
-	_dbName = "ppl-players";
-	_dbPlayers = ["new", _dbName] call OO_INIDBI;
-	
-	_isTrackLoadoutsActive = ["read", [_playerUid, "isTrackLoadoutsActive", false]] call _dbPlayers;
-	_trackLoadoutsKey = ["read", [_playerUid, "trackLoadoutsKey", ""]] call _dbPlayers;
-
-	if (_isTrackLoadoutsActive) then
-	{
-		if (_key != _trackLoadoutsKey) then
-		{
-			["write", [_playerUid, "trackLoadoutsKey", _key]] call _dbPlayers;
-			
-			_value = ["read", [_key, "value", "not set"]] call _dbLoadouts;
-			if ((str _value) != (str "not set")) then
-			{
-				["STR_PPL_Main_Notifications_Tracking", _key, _value] remoteExecCall ["PPL_fnc_hintLocalized", _clientId];
-			};
-		}
-		else
-		{
-			["write", [_playerUid, "isTrackLoadoutsActive", false]] call _dbPlayers;
-			["write", [_playerUid, "trackLoadoutsKey", ""]] call _dbPlayers;
-			["write", [_playerUid, "trackLoadoutsClientId", ""]] call _dbPlayers;
-		};
-	}
-	else
-	{
-		["write", [_playerUid, "isTrackLoadoutsActive", true]] call _dbPlayers;
-		["write", [_playerUid, "trackLoadoutsKey", _key]] call _dbPlayers;
-		["write", [_playerUid, "trackLoadoutsClientId", _clientId]] call _dbPlayers;
-
-		_value = ["read", [_key, "value", "not set"]] call _dbLoadouts;
-		if ((str _value) != (str "not set")) then
-		{
-			["STR_PPL_Main_Notifications_Tracking", _key, _value] remoteExecCall ["PPL_fnc_hintLocalized", _clientId];
-		};
-	};
-
-	_isTrackLoadoutsActive = ["read", [_playerUid, "isTrackLoadoutsActive", false]] call _dbPlayers;
-	_trackLoadoutsKey = ["read", [_playerUid, "trackLoadoutsKey", ""]] call _dbPlayers;
-	_trackLoadoutsClientId = ["read", [_playerUid, "trackLoadoutsClientId", ""]] call _dbPlayers;
-	
-	missionNamespace setVariable ["PPL_isTrackLoadoutsActive", _isTrackLoadoutsActive, false];
-	_clientId publicVariableClient "PPL_isTrackLoadoutsActive";
-	missionNamespace setVariable ["PPL_trackLoadoutsKey", _trackLoadoutsKey, false];
-	_clientId publicVariableClient "PPL_trackLoadoutsKey";
-
-	_result = [_isTrackLoadoutsActive, _trackLoadoutsKey, _trackLoadoutsClientId];
-	
-	_answer = _playerUid + "-answerSwitchTrackLoadouts";
-	missionNamespace setVariable [_answer, _result, false];
-	_clientId publicVariableClient _answer;
-	
-	[format ["[%1] PPL Player Request Switch Track Loadouts: Active: %2 Value: %3 (%4)", serverTime, _isTrackLoadoutsActive, _trackLoadoutsKey, _playerUid]] call PPL_fnc_log;
 };
 
 /* ================================================================================ */
@@ -217,6 +160,26 @@ params ["_playerUid"];
 			if ((_tmpPlayerUid == _requestedPlayerUid) && (!(_templateLoadout isEqualTo []))) then
 			{
 				_x setUnitLoadout [_templateLoadout, false];
+				
+				["write", [_requestedPlayerUid, "activeTemplate", _requestedTemplateId]] call _dbPlayers;
+				
+				_dbName = "ppl-loadouts-" + _requestedTemplateId + "-" + _requestedPlayerUid;
+				_dbLoadouts = ["new", _dbName] call OO_INIDBI;
+				
+				_players = [];
+				if ("exists" call _dbLoadouts) then {_loadouts = "getSections" call _dbLoadouts;};
+				
+				_loadoutId = [10] call PPL_fnc_generateId;	
+				while {(_loadouts find _loadoutId) > -1} do {_loadoutId = [10] call PPL_fnc_generateId;};
+				
+				_setupTimeStamp = "getTimeStamp" call _dbLoadouts;
+				
+				["write", [_loadoutId, "loadoutId", _loadoutId]] call _dbLoadouts;
+				["write", [_loadoutId, "templateId", _requestedTemplateId]] call _dbLoadouts;
+				["write", [_loadoutId, "playerId", _requestedPlayerUid]] call _dbLoadouts;
+				["write", [_loadoutId, "setupTimeStamp", _setupTimeStamp]] call _dbLoadouts;
+				["write", [_loadoutId, "setupLoadoutName", _templateName]] call _dbLoadouts;
+				["write", [_loadoutId, "setupLoadout", _templateLoadout]] call _dbLoadouts;
 			};
 		} forEach _allPlayerObj;
 
@@ -272,131 +235,6 @@ params ["_playerUid"];
 		
 		[format ["[%1] PPL Player Request Template Save: %2 (%3)", serverTime, _templateName, _playerUid]] call PPL_fnc_log;
 	};
-};
-
-/* ================================================================================ */
-
-(_playerUid + "-requestPromotePlayer") addPublicVariableEventHandler
-{
-	params ["_broadcastVariableName", "_broadcastVariableValue", "_broadcastVariableTarget"];
-
-	_playerUid = _broadcastVariableValue select 0;
-	_clientId = _broadcastVariableValue select 1;
-	_requestedPlayerUid = _broadcastVariableValue select 2;
-
-	_dbName = "ppl-players";
-	_dbPlayers = ["new", _dbName] call OO_INIDBI;
-	
-	_isAdmin = ["read", [_playerUid, "isAdmin", false]] call _dbPlayers;
-	_isAdminLoggedIn = ["read", [_playerUid, "isAdminLoggedIn", false]] call _dbPlayers;
-	
-	if (_isAdmin && _isAdminLoggedIn) then
-	{
-		_isAdmin = ["read", [_requestedPlayerUid, "isAdmin", false]] call _dbPlayers;
-		if (!_isAdmin) then
-		{
-			["write", [_requestedPlayerUid, "isAdmin", true]] call _dbPlayers;
-			_playerName = ["read", [_requestedPlayerUid, "playerName", false]] call _dbPlayers;
-			["STR_PPL_Main_Notifications_Player_Promoted", _playerName] remoteExecCall ["PPL_fnc_hintLocalized"];
-		};
-	};
-
-	_result = true;
-	
-	_answer = _playerUid + "-answerPromotePlayer";
-	missionNamespace setVariable [_answer, _result, false];
-	_clientId publicVariableClient _answer;
-	
-	[format ["[%1] PPL Player Request Promote Player: %2 (%3)", serverTime, _requestedPlayerUid, _playerUid]] call PPL_fnc_log;
-};
-
-/* ================================================================================ */
-
-(_playerUid + "-requestDegradePlayer") addPublicVariableEventHandler
-{
-	params ["_broadcastVariableName", "_broadcastVariableValue", "_broadcastVariableTarget"];
-
-	_playerUid = _broadcastVariableValue select 0;
-	_clientId = _broadcastVariableValue select 1;
-	_requestedPlayerUid = _broadcastVariableValue select 2;
-
-	_dbName = "ppl-players";
-	_dbPlayers = ["new", _dbName] call OO_INIDBI;
-	
-	_isAdmin = ["read", [_playerUid, "isAdmin", false]] call _dbPlayers;
-	_isAdminLoggedIn = ["read", [_playerUid, "isAdminLoggedIn", false]] call _dbPlayers;
-	
-	if (_isAdmin && _isAdminLoggedIn) then
-	{
-		_isAdmin = ["read", [_requestedPlayerUid, "isAdmin", false]] call _dbPlayers;
-		if (_isAdmin) then
-		{
-			["write", [_requestedPlayerUid, "isAdmin", false]] call _dbPlayers;
-			_playerName = ["read", [_requestedPlayerUid, "playerName", false]] call _dbPlayers;
-			["STR_PPL_Main_Notifications_Player_Degraded", _playerName] remoteExecCall ["PPL_fnc_hintLocalized"];
-		};
-	};
-
-	_result = true;
-	
-	_answer = _playerUid + "-answerDegradePlayer";
-	missionNamespace setVariable [_answer, _result, false];
-	_clientId publicVariableClient _answer;
-	
-	[format ["[%1] PPL Player Request Degrade Player: %2 (%3)", serverTime, _requestedPlayerUid, _playerUid]] call PPL_fnc_log;
-};
-/* ================================================================================ */
-
-(_playerUid + "-requestDeletePlayer") addPublicVariableEventHandler
-{
-	params ["_broadcastVariableName", "_broadcastVariableValue", "_broadcastVariableTarget"];
-
-	_playerUid = _broadcastVariableValue select 0;
-	_clientId = _broadcastVariableValue select 1;
-	_requestedPlayerUid = _broadcastVariableValue select 2;
-
-	_dbName = "ppl-players";
-	_dbPlayers = ["new", _dbName] call OO_INIDBI;
-	
-	_isAdmin = ["read", [_playerUid, "isAdmin", false]] call _dbPlayers;
-	_isAdminLoggedIn = ["read", [_playerUid, "isAdminLoggedIn", false]] call _dbPlayers;
-	_playerName = ["read", [_requestedPlayerUid, "playerName", false]] call _dbPlayers;
-	
-	if ((_playerUid == _requestedPlayerUid) || (_isAdmin && _isAdminLoggedIn)) then
-	{
-		_dbName = "ppl-events";
-		_dbEvents = ["new", _dbName] call OO_INIDBI;
-		
-		if ("exists" call _dbEvents) then
-		{
-			_events = "getSections" call _dbEvents;	
-			{
-				_dbName = "ppl-loadouts-" + _requestedPlayerUid + "-" + _x;
-				_dbLoadouts = ["new", _dbName] call OO_INIDBI;	
-
-				if ("exists" call _dbLoadouts) then {"delete" call _dbLoadouts;};
-				
-				_eventPlayerUids = ["read", [_x, "eventPlayerUids", ""]] call _dbEvents;
-				_eventPlayerUidsWithoutPlayer = [];
-				{
-					if (_x != _requestedPlayerUid) then {_eventPlayerUidsWithoutPlayer = _eventPlayerUidsWithoutPlayer + [_x]};
-				} forEach _eventPlayerUids;
-				["write", [_x, "eventPlayerUids", _eventPlayerUidsWithoutPlayer]] call _dbEvents;
-			} forEach _events;
-		};
-		
-		["deleteSection", _requestedPlayerUid] call _dbPlayers;
-		
-		["STR_PPL_Main_Notifications_Player_Deleted", _playerName] remoteExecCall ["PPL_fnc_hintLocalized"];
-	};
-
-	_result = true;
-	
-	_answer = _playerUid + "-answerDeletePlayer";
-	missionNamespace setVariable [_answer, _result, false];
-	_clientId publicVariableClient _answer;
-	
-	[format ["[%1] PPL Player Request Delete Player: %2 (%3)", serverTime, _requestedPlayerUid, _playerUid]] call PPL_fnc_log;
 };
 
 /* ================================================================================ */
@@ -482,6 +320,77 @@ params ["_playerUid"];
 
 /* ================================================================================ */
 
+(_playerUid + "-requestPromotePlayer") addPublicVariableEventHandler
+{
+	params ["_broadcastVariableName", "_broadcastVariableValue", "_broadcastVariableTarget"];
+
+	_playerUid = _broadcastVariableValue select 0;
+	_clientId = _broadcastVariableValue select 1;
+	_requestedPlayerUid = _broadcastVariableValue select 2;
+
+	_dbName = "ppl-players";
+	_dbPlayers = ["new", _dbName] call OO_INIDBI;
+	
+	_isAdmin = ["read", [_playerUid, "isAdmin", false]] call _dbPlayers;
+	_isAdminLoggedIn = ["read", [_playerUid, "isAdminLoggedIn", false]] call _dbPlayers;
+	
+	if (_isAdmin && _isAdminLoggedIn) then
+	{
+		_isAdmin = ["read", [_requestedPlayerUid, "isAdmin", false]] call _dbPlayers;
+		if (!_isAdmin) then
+		{
+			["write", [_requestedPlayerUid, "isAdmin", true]] call _dbPlayers;
+			_playerName = ["read", [_requestedPlayerUid, "playerName", false]] call _dbPlayers;
+			["STR_PPL_Main_Notifications_Player_Promoted", _playerName] remoteExecCall ["PPL_fnc_hintLocalized"];
+		};
+	};
+
+	_result = true;
+	
+	_answer = _playerUid + "-answerPromotePlayer";
+	missionNamespace setVariable [_answer, _result, false];
+	_clientId publicVariableClient _answer;
+	
+	[format ["[%1] PPL Player Request Promote Player: %2 (%3)", serverTime, _requestedPlayerUid, _playerUid]] call PPL_fnc_log;
+};
+
+/* ================================================================================ */
+
+(_playerUid + "-requestDegradePlayer") addPublicVariableEventHandler
+{
+	params ["_broadcastVariableName", "_broadcastVariableValue", "_broadcastVariableTarget"];
+
+	_playerUid = _broadcastVariableValue select 0;
+	_clientId = _broadcastVariableValue select 1;
+	_requestedPlayerUid = _broadcastVariableValue select 2;
+
+	_dbName = "ppl-players";
+	_dbPlayers = ["new", _dbName] call OO_INIDBI;
+	
+	_isAdmin = ["read", [_playerUid, "isAdmin", false]] call _dbPlayers;
+	_isAdminLoggedIn = ["read", [_playerUid, "isAdminLoggedIn", false]] call _dbPlayers;
+	
+	if (_isAdmin && _isAdminLoggedIn) then
+	{
+		_isAdmin = ["read", [_requestedPlayerUid, "isAdmin", false]] call _dbPlayers;
+		if (_isAdmin) then
+		{
+			["write", [_requestedPlayerUid, "isAdmin", false]] call _dbPlayers;
+			_playerName = ["read", [_requestedPlayerUid, "playerName", false]] call _dbPlayers;
+			["STR_PPL_Main_Notifications_Player_Degraded", _playerName] remoteExecCall ["PPL_fnc_hintLocalized"];
+		};
+	};
+
+	_result = true;
+	
+	_answer = _playerUid + "-answerDegradePlayer";
+	missionNamespace setVariable [_answer, _result, false];
+	_clientId publicVariableClient _answer;
+	
+	[format ["[%1] PPL Player Request Degrade Player: %2 (%3)", serverTime, _requestedPlayerUid, _playerUid]] call PPL_fnc_log;
+};
+/* ================================================================================ */
+
 (_playerUid + "-requestExportLoadouts") addPublicVariableEventHandler
 {
 	params ["_broadcastVariableName", "_broadcastVariableValue", "_broadcastVariableTarget"];
@@ -564,7 +473,7 @@ params ["_playerUid"];
 	_playerUid = _broadcastVariableValue select 0;
 	_clientId = _broadcastVariableValue select 1;
 	_requestedPlayerUid = _broadcastVariableValue select 2;
-	_requestedEventId = _broadcastVariableValue select 3;
+	_requestedTemplateId = _broadcastVariableValue select 3;
 	_filterLoadouts = _broadcastVariableValue select 4;
 	
 	_dbName = "ppl-players";
@@ -572,102 +481,36 @@ params ["_playerUid"];
 	
 	_isAdmin = ["read", [_playerUid, "isAdmin", false]] call _dbPlayers;
 	_isAdminLoggedIn = ["read", [_playerUid, "isAdminLoggedIn", false]] call _dbPlayers;
-	_isTrackLoadoutsActive = ["read", [_playerUid, "isTrackLoadoutsActive", false]] call _dbPlayers;
-	_trackLoadoutsKey = ["read", [_playerUid, "trackLoadoutsKey", ""]] call _dbPlayers;
 	
-	missionNamespace setVariable ["PPL_isTrackLoadoutsActive", _isTrackLoadoutsActive, false];
-	_clientId publicVariableClient "PPL_isTrackLoadoutsActive";
-	missionNamespace setVariable ["PPL_trackLoadoutsKey", _trackLoadoutsKey, false];
-	_clientId publicVariableClient "PPL_trackLoadoutsKey";
-		
-	if ((_playerUid == _requestedPlayerUid) || _isAdmin) then
+	if ((_playerUid == _requestedPlayerUid) || (_isAdmin && _isAdminLoggedIn)) then
 	{
-		if (_playerUid != _requestedPlayerUid) then {_isTrackLoadoutsActive = false; _trackLoadoutsKey = "";};
-		
-		_dbName = "ppl-loadouts-" + _requestedPlayerUid + "-" + _requestedEventId;
+		_dbName = "ppl-loadouts-" + _requestedTemplateId + "-" + _requestedPlayerUid;
 		_dbLoadouts = ["new", _dbName] call OO_INIDBI;
 
-		_tmpResult = [];
+		_filteredLoadouts = [];	
 		if ("exists" call _dbLoadouts) then
 		{
 			_loadouts = "getSections" call _dbLoadouts;
-			
-			_timeInEvent = ["read", ["timeInEvent", "value", 0]] call _dbLoadouts;
-			_countProjectilesFired = ["read", ["countProjectilesFired", "value", 0]] call _dbLoadouts;
-			_countGrenadesThrown = ["read", ["countGrenadesThrown", "value", 0]] call _dbLoadouts;
-			
+
 			{
-				_value = ["read", [_x, "value", ""]] call _dbLoadouts;
-				_type = ["read", [_x, "type", ""]] call _dbLoadouts;
-				_formatType = ["read", [_x, "formatType", -1]] call _dbLoadouts;
-				_formatString = ["read", [_x, "formatString", ""]] call _dbLoadouts;
-				_source = ["read", [_x, "source", ""]] call _dbLoadouts;
+				_loadoutId = ["read", [_x, "loadoutId", ""]] call _dbLoadouts;
+				//_requestedTemplateId = ["read", [_x, "templateId", ""]] call _dbLoadouts;
+				//_requestedPlayerUid = ["read", [_x, "playerId", ""]] call _dbLoadouts;
+				_setupTimeStamp = ["read", [_x, "setupTimeStamp", [0, 0, 0, 0, 0, 0]]] call _dbLoadouts;
+				_setupLoadoutName = ["read", [_x, "setupLoadoutName", []]] call _dbLoadouts;
+				_setupLoadout = ["read", [_x, "setupLoadout", []]] call _dbLoadouts;
 				
-					switch (_formatType) do
-					{
-						case 0:
-						{
-							_tmpResult = _tmpResult + [[_x, _formatString, _source, _value, "", ""]];
-						};
-						case 1:
-						{
-							_roundValue = parseNumber ((_value / 3600) toFixed 2);
-							_roundValuePercent = parseNumber ((100 / _timeInEvent * _value) toFixed 2);
-							_tmpResult = _tmpResult + [[_x, _formatString, _source, "%", str _roundValue, str _roundValuePercent]];
-						};
-						case 2:
-						{
-							_roundValuePercent = 100;
-							if (_countProjectilesFired > 0) then 
-							{
-								_roundValuePercent = parseNumber ((100 / _countProjectilesFired * _value) toFixed 2);
-							};
-							_tmpResult = _tmpResult + [[_x, _formatString, _source, "%", _value, _roundValuePercent]];
-
-						};
-						case 3:
-						{
-							_roundValue = parseNumber ((_value / 3600) toFixed 2);
-							_tmpResult = _tmpResult + [[_x, _formatString, _source, str _roundValue, "", ""]];
-						};
-						case 4:
-						{
-							_roundValuePercent = 100;
-							if (_countGrenadesThrown > 0) then 
-							{
-								_roundValuePercent = parseNumber ((100 / _countGrenadesThrown * _value) toFixed 2);
-							};
-							_tmpResult = _tmpResult + [[_x, _formatString, _source, "%", _value, _roundValuePercent]];
-
-						};
-						case -1:
-						{
-							_tmpResult = _tmpResult + [[_x, localize "STR_PPL_Main_Dialog_List_Value_Not_Recorded", _source, _value, "", ""]];
-						};
-					};
+				_filteredLoadouts = _filteredLoadouts + [[_setupTimeStamp, _loadoutId, _setupLoadoutName]];
 					
 			} forEach _loadouts;
-		};
-		
-		_resultLoadouts = [];	
-		if(_filterLoadouts != "") then
-		{
-			{
-				if (((toLower (_x select 0)) find (toLower _filterLoadouts)) > -1) then
-				{
-					_resultLoadouts = _resultLoadouts + [_x];
-				};
-			} forEach _tmpResult;
-		}
-		else
-		{
-			_resultLoadouts = _tmpResult;
 		};
 
 		/* ---------------------------------------- */
 
+		_result = [_playerUid, _clientId, _isAdmin, _isAdminLoggedIn, _filteredLoadouts];
+		
 		_answer = _playerUid + "-answerLoadoutsFiltered";
-		missionNamespace setVariable [_answer, [_resultLoadouts, _isTrackLoadoutsActive, _trackLoadoutsKey], false];
+		missionNamespace setVariable [_answer, _result, false];
 		_clientId publicVariableClient _answer;
 				
 		[format ["[%1] PPL Player Request Loadouts Filtered: (%2)", serverTime, _requestedPlayerUid]] call PPL_fnc_log;
@@ -705,10 +548,8 @@ params ["_playerUid"];
 			_templateId = ["read", [_x, "templateId", 0]] call _dbTemplates;
 			_templateName = ["read", [_x, "templateName", ""]] call _dbTemplates;
 			
-			if ((((toLower _templateName) find (toLower _filterTemplates)) > -1) || (_filterTemplates == "")) then
-			{
-				_filteredTemplates = _filteredTemplates + [[_templateId, _templateName]];
-			};
+			_filteredTemplates = _filteredTemplates + [[_templateId, _templateName]];
+			
 		} forEach _templates;
 	};
 
@@ -810,7 +651,7 @@ params ["_playerUid"];
 	_players = "getSections" call _dbPlayers;
 	_countPlayersTotal = count _players;
 	
-	_tmpResult = [];
+	_filteredPlayers = [];
 	_playerOnly = [];
 	{
 		_tmpPlayerName = ["read", [_x, "playerName", ""]] call _dbPlayers;
@@ -822,29 +663,14 @@ params ["_playerUid"];
 		_tmpPlayerStatus = false;
 		if ((_allActivePlayersIds find _tmpPlayerUid) > -1) then {_tmpPlayerStatus = true;};
 		
-		_tmpResult = _tmpResult + [[_tmpPlayerName, _tmpPlayerUid, _tmpIsAdmin, _tmpIsAdminLoggedIn, _tmpPlayerStatus]];
+		_filteredPlayers = _filteredPlayers + [[_tmpPlayerName, _tmpPlayerUid, _tmpIsAdmin, _tmpIsAdminLoggedIn, _tmpPlayerStatus]];
 		if (_tmpPlayerUid == _playerUid) then
 		{
 			_playerOnly = [[_tmpPlayerName, _tmpPlayerUid, _tmpIsAdmin, _tmpIsAdminLoggedIn, _tmpPlayerStatus]];
 		};
 	} forEach _players;
 	
-	if (!_isAdminLoggedIn) then {_tmpResult = _playerOnly;};
-	
-	_filteredPlayers = [];
-	if(_filterPlayers != "") then
-	{
-		{
-			if (((toLower (_x select 0)) find (toLower _filterPlayers)) > -1) then
-			{
-				_filteredPlayers = _filteredPlayers + [_x];
-			};
-		} forEach _tmpResult;
-	}
-	else
-	{
-		_filteredPlayers = _tmpResult;
-	};
+	if (!_isAdminLoggedIn) then {_filteredPlayers = _playerOnly;};
 
 	/* ---------------------------------------- */
 
@@ -860,72 +686,6 @@ params ["_playerUid"];
 	_clientId publicVariableClient _answer;
 
 	[format ["[%1] PPL Player Request Dialog Update: (%2)", serverTime, _playerUid]] call PPL_fnc_log;
-};
-
-/* ================================================================================ */
-
-(_playerUid + "-updateLoadouts") addPublicVariableEventHandler
-{
-	params ["_broadcastVariableName", "_broadcastVariableValue", "_broadcastVariableTarget"];
-	
-	if (PPL_isEvent) then
-	{
-		_playerUid = _broadcastVariableValue select 0;
-		_intervalLoadouts = _broadcastVariableValue select 1;
-		
-		_dbName = "ppl-loadouts-" + _playerUid + "-" + PPL_eventId;
-		_dbLoadouts = ["new", _dbName] call OO_INIDBI;
-		
-		{
-			_key = _x select 0;
-			_value = _x select 1;
-			_type = _x select 2;
-			_formatType = _x select 3;
-			_formatString = _x select 4;
-			_source = _x select 5;
-			
-			if (_value > 0) then
-			{
-				_valueOld = ["read", [_key, "value", -1]] call _dbLoadouts;
-				if (_valueOld == -1) then
-				{
-					_valueOld = 0;
-					_value = _valueOld + _value;
-					["write", [_key, "key", _key]] call _dbLoadouts;
-					["write", [_key, "key", _key]] call _dbLoadouts;
-					["write", [_key, "value", _value]] call _dbLoadouts;
-					["write", [_key, "type", _type]] call _dbLoadouts;
-					["write", [_key, "formatType", _formatType]] call _dbLoadouts;
-					["write", [_key, "formatString", _formatString]] call _dbLoadouts;
-					["write", [_key, "source", _source]] call _dbLoadouts;
-				}
-				else
-				{
-					_value = _valueOld + _value;
-					["write", [_key, "value", _value]] call _dbLoadouts;
-				};
-			};
-		} forEach _intervalLoadouts;
-		
-		_dbName = "ppl-players";
-		_dbPlayers = ["new", _dbName] call OO_INIDBI;
-		
-		_isTrackLoadoutsActive = ["read", [_playerUid, "isTrackLoadoutsActive", false]] call _dbPlayers;
-		_trackLoadoutsKey = ["read", [_playerUid, "trackLoadoutsKey", ""]] call _dbPlayers;
-		_trackLoadoutsClientId = ["read", [_playerUid, "trackLoadoutsClientId", ""]] call _dbPlayers;
-		
-		if (_isTrackLoadoutsActive) then
-		{
-			_trackLoadoutsValue = ["read", [_trackLoadoutsKey, "value", "not set"]] call _dbLoadouts;
-
-			if ((str _trackLoadoutsValue) != (str "not set")) then
-			{
-				["STR_PPL_Main_Notifications_Tracking", _trackLoadoutsKey, _trackLoadoutsValue] remoteExecCall ["PPL_fnc_hintLocalized", _trackLoadoutsClientId];
-			};
-		};
-	
-		[format ["[%1] PPL Player Updated Loadouts: (%2)", serverTime, _playerUid]] call PPL_fnc_log;
-	};
 };
 
 /* ================================================================================ */
