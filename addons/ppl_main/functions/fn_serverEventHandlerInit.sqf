@@ -180,6 +180,9 @@ params ["_playerUid"];
 				["write", [_loadoutId, "setupTimeStamp", _setupTimeStamp]] call _dbLoadouts;
 				["write", [_loadoutId, "setupLoadoutName", _templateName]] call _dbLoadouts;
 				["write", [_loadoutId, "setupLoadout", _templateLoadout]] call _dbLoadouts;
+				["write", [_loadoutId, "actualTimeStamp", _setupTimeStamp]] call _dbLoadouts;
+				["write", [_loadoutId, "actualLoadoutName", _templateName]] call _dbLoadouts;
+				["write", [_loadoutId, "actualLoadout", _templateLoadout]] call _dbLoadouts;
 			};
 		} forEach _allPlayerObj;
 
@@ -328,6 +331,71 @@ params ["_playerUid"];
 	_clientId publicVariableClient _answer;
 	
 	[format ["[%1] PPL Player Request Template Delete : %2 (%3)", serverTime, _templateName, _playerUid]] call PPL_fnc_log;
+};
+
+/* ================================================================================ */
+
+(_playerUid + "-requestLoadoutAssign") addPublicVariableEventHandler
+{
+	params ["_broadcastVariableName", "_broadcastVariableValue", "_broadcastVariableTarget"];
+
+	_playerUid = _broadcastVariableValue select 0;
+	_clientId = _broadcastVariableValue select 1;
+	_requestedPlayerUid = _broadcastVariableValue select 2;
+	_requestedLoadoutId = _broadcastVariableValue select 3;
+
+	_dbName = "ppl-players";
+	_dbPlayers = ["new", _dbName] call OO_INIDBI;
+	_players = "getSections" call _dbPlayers;
+	
+	_isAdmin = ["read", [_playerUid, "isAdmin", false]] call _dbPlayers;
+	_isAdminLoggedIn = ["read", [_playerUid, "isAdminLoggedIn", false]] call _dbPlayers;
+	
+	if ((_playerUid == _requestedPlayerUid) || (_isAdmin && _isAdminLoggedIn)) then
+	{		
+		_dbName = "ppl-templates";
+		_dbTemplates = ["new", _dbName] call OO_INIDBI;
+		
+		_templates = "getSections" call _dbTemplates;
+		
+		_loadout = [];
+		_loadoutName = "";
+		{
+			_dbName = "ppl-loadouts-" + _x + "-" + _requestedPlayerUid;
+			_dbLoadouts = ["new", _dbName] call OO_INIDBI;
+			
+			if ("exists" call _dbLoadouts) then
+			{
+				_tmpLoadout = ["read", [_requestedLoadoutId, "actualLoadout", []]] call _dbLoadouts;
+				_tmpLoadoutName = ["read", [_requestedLoadoutId, "actualLoadoutName", ""]] call _dbLoadouts;
+				if (!(_tmpLoadout isEqualTo [])) then {_loadout = _tmpLoadout;};
+				if (_tmpLoadoutName != "") then {_loadoutName = _tmpLoadoutName;};
+			};
+		} forEach _templates;
+		
+		if (!(_loadout isEqualTo [])) then
+		{
+			_allPlayerObj = allPlayers;
+			{
+				_tmpPlayerUid = getPlayerUID _x;
+								
+				if (_tmpPlayerUid == _requestedPlayerUid) then
+				{
+					_x setUnitLoadout [_loadout, false];
+					
+					["write", [_requestedPlayerUid, "activeLoadout", _requestedLoadoutId]] call _dbPlayers;
+				};
+			} forEach _allPlayerObj;
+		};
+
+		_result = true;
+		
+		_answer = _playerUid + "-answerLoadoutAssign";
+		missionNamespace setVariable [_answer, _result, false];
+		_clientId publicVariableClient _answer;
+		
+		[format ["[%1] PPL Player Request Loadout Assign: %2 - %3 (%4)", serverTime, _loadoutName, _requestedPlayerUid, _playerUid]] call PPL_fnc_log;
+	};
 };
 
 /* ================================================================================ */
@@ -517,13 +585,12 @@ params ["_playerUid"];
 
 					{
 						_loadoutId = ["read", [_x, "loadoutId", ""]] call _dbLoadouts;
-						//_requestedTemplateId = ["read", [_x, "templateId", ""]] call _dbLoadouts;
-						//_requestedPlayerUid = ["read", [_x, "playerId", ""]] call _dbLoadouts;
 						_setupTimeStamp = ["read", [_x, "setupTimeStamp", [0, 0, 0, 0, 0, 0]]] call _dbLoadouts;
 						_setupLoadoutName = ["read", [_x, "setupLoadoutName", []]] call _dbLoadouts;
-						_setupLoadout = ["read", [_x, "setupLoadout", []]] call _dbLoadouts;
+						_actualTimeStamp = ["read", [_x, "actualTimeStamp", [0, 0, 0, 0, 0, 0]]] call _dbLoadouts;
+						_actualLoadoutName = ["read", [_x, "actualLoadoutName", []]] call _dbLoadouts;
 						
-						_requestedLoadouts = _requestedLoadouts + [[_setupTimeStamp, _loadoutId, _setupLoadoutName]];
+						_requestedLoadouts = _requestedLoadouts + [[_setupTimeStamp, _actualTimeStamp, _loadoutId, _setupLoadoutName, _actualLoadoutName]];
 							
 					} forEach _loadouts;
 				};

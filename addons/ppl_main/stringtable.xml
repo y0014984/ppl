@@ -100,11 +100,15 @@
 				<English>Delete</English>
 				<German>löschen</German>
 			</Key>
-			<Key ID="STR_PPL_Main_Dialog_Button_Update">
+			<Key ID="STR_PPL_Main_Dialog_Button_Loadout_Assign">
+				<English>Assign</English>
+				<German>zuweisen</German>
+			</Key>
+			<Key ID="STR_PPL_Main_Dialog_Button_Loadout_Update">
 				<English>Update</English>
 				<German>aktualisieren</German>
 			</Key>
-			<Key ID="STR_PPL_Main_Dialog_Button_Export">
+			<Key ID="STR_PPL_Main_Dialog_Button_Loadouts_Export">
 				<English>Export</English>
 				<German>exportieren</German>
 			</Key>
@@ -293,6 +297,10 @@
 			<Key ID="STR_PPL_Main_Notifications_Loadouts_Exported_To_Clipboard">
 				<English>Persistent Player Loadout\n\nLoadouts exported to Clipboard.</English>
 				<German>Persistent Player Loadout\n\nAusrüstungen in die Zwischenablage exportiert.</German>
+			</Key>
+			<Key ID="STR_PPL_Main_Notifications_No_Loadout_Selected">
+				<English>Persistent Player Loadout\n\nNo loadout selected.</English>
+				<German>Persistent Player Loadout\n\nKeine Ausrüstung ausgewählt.</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Notifications_No_Template_Selected">
 				<English>Persistent Player Loadout\n\nNo template selected.</English>

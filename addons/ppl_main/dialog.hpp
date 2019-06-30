@@ -157,6 +157,16 @@ class PPL_Main_Dialog
 			
 			action = "[] call PPL_fnc_dialogButtonPlayerPromoteExec;";
 		};
+		class PPL_RscEdit_1603: RscEdit
+		{
+			idc = 1603;
+			text = "";
+			x = 0 * GUI_GRID_W + GUI_GRID_X;
+			y = 22.5 * GUI_GRID_H + GUI_GRID_Y;
+			w = 12.5 * GUI_GRID_W;
+			h = 1 * GUI_GRID_H;
+			colorBackground[] = {0,0.5,0,0.5};
+		};
 		class PPL_RscButton_1602: RscButton
 		{
 			idc = 1602;
@@ -201,48 +211,38 @@ class PPL_Main_Dialog
 			
 			action = "[] call PPL_fnc_dialogButtonTemplateDeleteExec;";
 		};		
-		class PPL_RscEdit_1603: RscEdit
-		{
-			idc = 1603;
-			text = "";
-			x = 0 * GUI_GRID_W + GUI_GRID_X;
-			y = 22.5 * GUI_GRID_H + GUI_GRID_Y;
-			w = 12.5 * GUI_GRID_W;
-			h = 1 * GUI_GRID_H;
-			colorBackground[] = {0,0.5,0,0.5};
-		};
 		class PPL_RscButton_1604: RscButton
 		{
 			idc = 1604;
-			text = $STR_PPL_Main_Dialog_Button_Track_Value;
-			x = 27.5 * GUI_GRID_W + GUI_GRID_X;
+			text = $STR_PPL_Main_Dialog_Button_Loadout_Assign;
+			x = 21 * GUI_GRID_W + GUI_GRID_X;
 			y = 22.5 * GUI_GRID_H + GUI_GRID_Y;
 			w = 6 * GUI_GRID_W;
 			h = 1 * GUI_GRID_H;
 			
-			action = "";
+			action = "[] call PPL_fnc_dialogButtonLoadoutAssignExec;";
 		};
 		class PPL_RscButton_1605: RscButton
 		{
 			idc = 1605;
-			text = $STR_PPL_Main_Dialog_Button_Export;
-			x = 34 * GUI_GRID_W + GUI_GRID_X;
+			text = $STR_PPL_Main_Dialog_Button_Loadouts_Export;
+			x = 27.5 * GUI_GRID_W + GUI_GRID_X;
 			y = 22.5 * GUI_GRID_H + GUI_GRID_Y;
 			w = 6 * GUI_GRID_W;
 			h = 1 * GUI_GRID_H;
 			
 			action = "[] call PPL_fnc_dialogButtonLoadoutsExportExec;";
 		};
-		class PPL_RscButton_1601: RscButton
+		class PPL_RscButton_1609: RscButton
 		{
-			idc = 1601;
-			text = $STR_PPL_Main_Dialog_Button_Update;
+			idc = 1609;
+			text = $STR_PPL_Main_Dialog_Button_Loadout_Update;
 			x = 34 * GUI_GRID_W + GUI_GRID_X;
-			y = 24 * GUI_GRID_H + GUI_GRID_Y;
+			y = 22.5 * GUI_GRID_H + GUI_GRID_Y;
 			w = 6 * GUI_GRID_W;
 			h = 1 * GUI_GRID_H;
 			
-			action = "[] call PPL_fnc_triggerServerDialogUpdate;";
+			action = "[] call PPL_fnc_dialogButtonLoadoutUpdateExec;";
 		};
 		////////////////////////////////////////////////////////
 		// GUI EDITOR OUTPUT END

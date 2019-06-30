@@ -251,6 +251,8 @@ _answer addPublicVariableEventHandler
 	_templateLoadButton = (findDisplay 24984) displayCtrl 1607;
 	_templateRenameButton = (findDisplay 24984) displayCtrl 1606;
 	_templateDeleteButton = (findDisplay 24984) displayCtrl 1608;
+	_loadoutAssignButton = (findDisplay 24984) displayCtrl 1604;
+	_loadoutsExportButton = (findDisplay 24984) displayCtrl 1605;
 	_promoteButton = (findDisplay 24984) displayCtrl 1610;
 	
 	_playersFilterEditBox = (findDisplay 24984) displayCtrl 1400;
@@ -273,6 +275,8 @@ _answer addPublicVariableEventHandler
 		_templateLoadButton ctrlShow true;
 		_templateRenameButton ctrlShow true;
 		_templateDeleteButton ctrlShow true;
+		_loadoutAssignButton ctrlShow true;
+		_loadoutsExportButton ctrlShow true;
 		_promoteButton ctrlShow true;
 	}
 	else
@@ -286,6 +290,8 @@ _answer addPublicVariableEventHandler
 		_templateLoadButton ctrlShow false;
 		_templateRenameButton ctrlShow false;
 		_templateDeleteButton ctrlShow false;
+		_loadoutAssignButton ctrlShow false;
+		_loadoutsExportButton ctrlShow false;
 		_promoteButton ctrlShow false;
 	};
 
@@ -393,8 +399,10 @@ _answer addPublicVariableEventHandler
 	_loadouts sort false;
 	{
 		_dbSetupTimeStamp = _x select 0;
-		_dbLoadoutId = _x select 1;
-		_dbSetupLoadoutName = _x select 2;
+		_dbActualTimeStamp = _x select 1;
+		_dbLoadoutId = _x select 2;
+		_dbSetupLoadoutName = _x select 3;
+		_dbActualLoadoutName = _x select 4;
 		
 		_year = _dbSetupTimeStamp select 0;
 		if (_year < 10) then {_year = format ["0%1", str _year];} else {_year = str _year;};
@@ -403,9 +411,18 @@ _answer addPublicVariableEventHandler
 		_day = _dbSetupTimeStamp select 2;
 		if (_day < 10) then {_day = format ["0%1", str _day];} else {_day = str _day;};
 		
-		_dateString = format ["%1-%2-%3", _year, _month, _day];	
+		_dateStringSetup = format ["%1-%2-%3", _year, _month, _day];
 		
-		_loadoutText = _dateString + " " + _dbSetupLoadoutName;
+		_year = _dbActualTimeStamp select 0;
+		if (_year < 10) then {_year = format ["0%1", str _year];} else {_year = str _year;};
+		_month = _dbSetupTimeStamp select 1;
+		if (_month < 10) then {_month = format ["0%1", str _month];} else {_month = str _month;};
+		_day = _dbSetupTimeStamp select 2;
+		if (_day < 10) then {_day = format ["0%1", str _day];} else {_day = str _day;};
+		
+		_dateStringActual = format ["%1-%2-%3", _year, _month, _day];
+		
+		_loadoutText = _dateStringSetup + " " + _dbSetupLoadoutName + " (" + _dateStringActual + " " + _dbActualLoadoutName + ")";
 		
 		if ((((toLower _loadoutText) find (toLower _loadoutsFilter)) > -1) || (_loadoutsFilter == "")) then
 		{
