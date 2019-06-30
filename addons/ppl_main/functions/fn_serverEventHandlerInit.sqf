@@ -301,6 +301,18 @@ params ["_playerUid"];
 	{
 		if (_isAdmin && _isAdminLoggedIn) then
 		{
+			_players = "getSections" call _dbPlayers;
+			
+			{
+				_dbName = "ppl-loadouts-" + _requestedTemplateId + "-" + _x;
+				_dbLoadouts = ["new", _dbName] call OO_INIDBI;
+				
+				if ("exists" call _dbLoadouts) then
+				{
+					"delete" call _dbLoadouts;
+				};
+			} forEach _players;
+			
 			_templateName = ["read", [_requestedTemplateId, "templateName", ""]] call _dbTemplates;
 			
 			["deleteSection", _requestedTemplateId] call _dbTemplates;

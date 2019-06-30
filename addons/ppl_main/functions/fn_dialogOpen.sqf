@@ -112,7 +112,7 @@ if (hasInterface ) then
 		_playersListBox = (findDisplay 24984) displayCtrl 1500;
 		_playersListBox ctrlAddEventHandler ["MouseButtonDblClick",
 		{
-			params ["_control"];
+			params ["_control", "_button", "_xPos", "_yPos", "_shift", "_ctrl", "_alt"];
 
 			_playerUid = getPlayerUID player;
 			_clientId = clientOwner;
@@ -132,7 +132,7 @@ if (hasInterface ) then
 		_templatesListBox = (findDisplay 24984) displayCtrl 1501;
 		_templatesListBox ctrlAddEventHandler ["MouseButtonDblClick",
 		{
-			params ["_control"];
+			params ["_control", "_button", "_xPos", "_yPos", "_shift", "_ctrl", "_alt"];
 
 			_playerUid = getPlayerUID player;
 			_clientId = clientOwner;
@@ -148,11 +148,22 @@ if (hasInterface ) then
 		}];
 		
 		/* ---------------------------------------- */
+		
+		_templatesListBox = (findDisplay 24984) displayCtrl 1501;
+		_templatesListBox ctrlAddEventHandler ["MouseButtonClick",
+		{
+			params ["_control", "_button", "_xPos", "_yPos", "_shift", "_ctrl", "_alt"];
+
+			//hint format["_control: %1\n\n_button: %2", _control, _button];
+			if (_button == 1) then {_control lbSetCurSel -1;};
+		}];
+		
+		/* ---------------------------------------- */
 
 		_loadoutsListBox = (findDisplay 24984) displayCtrl 1502;
 		_loadoutsListBox ctrlAddEventHandler ["MouseButtonDblClick",
 		{
-			params ["_control"];
+			params ["_control", "_button", "_xPos", "_yPos", "_shift", "_ctrl", "_alt"];
 
 			_playerUid = getPlayerUID player;
 			_clientId = clientOwner;
@@ -169,9 +180,6 @@ if (hasInterface ) then
 			_playersListBox = (findDisplay 24984) displayCtrl 1500;
 			_selectedPlayerIndex = lbCurSel _playersListBox;
 			_requestedPlayerUid = _playersListBox lbData _selectedPlayerIndex;
-
-			
-			
 			
 			_request = _playerUid + "-requestDetails";
 			missionNamespace setVariable [_request, [_playerUid, _clientId, _dataType, [_requestedLoadoutId, _requestedTemplateId, _requestedPlayerUid]], false];
