@@ -466,7 +466,7 @@ params ["_playerUid"];
 
 /* ================================================================================ */
 
-(_playerUid + "-requestLoadoutsFiltered") addPublicVariableEventHandler
+(_playerUid + "-requestLoadouts") addPublicVariableEventHandler
 {
 	params ["_broadcastVariableName", "_broadcastVariableValue", "_broadcastVariableTarget"];
 	
@@ -474,58 +474,70 @@ params ["_playerUid"];
 	_clientId = _broadcastVariableValue select 1;
 	_requestedPlayerUid = _broadcastVariableValue select 2;
 	_requestedTemplateId = _broadcastVariableValue select 3;
-	_filterLoadouts = _broadcastVariableValue select 4;
 	
 	_dbName = "ppl-players";
 	_dbPlayers = ["new", _dbName] call OO_INIDBI;
 	
 	_isAdmin = ["read", [_playerUid, "isAdmin", false]] call _dbPlayers;
 	_isAdminLoggedIn = ["read", [_playerUid, "isAdminLoggedIn", false]] call _dbPlayers;
-	
-	if ((_playerUid == _requestedPlayerUid) || (_isAdmin && _isAdminLoggedIn)) then
+
+	_requestedTemplates = [_requestedTemplateId];
+	if (_requestedTemplateId == "") then
 	{
-		_dbName = "ppl-loadouts-" + _requestedTemplateId + "-" + _requestedPlayerUid;
-		_dbLoadouts = ["new", _dbName] call OO_INIDBI;
+		_dbName = "ppl-templates";
+		_dbTemplates = ["new", _dbName] call OO_INIDBI;
 
-		_filteredLoadouts = [];	
-		if ("exists" call _dbLoadouts) then
+		if ("exists" call _dbTemplates) then {_requestedTemplates = "getSections" call _dbTemplates} else {_requestedTemplates = []};
+	};
+
+	if (!(_requestedTemplates isEqualTo [])) then
+	{
+		if ((_playerUid == _requestedPlayerUid) || (_isAdmin && _isAdminLoggedIn)) then
 		{
-			_loadouts = "getSections" call _dbLoadouts;
-
+			_requestedLoadouts = [];	
 			{
-				_loadoutId = ["read", [_x, "loadoutId", ""]] call _dbLoadouts;
-				//_requestedTemplateId = ["read", [_x, "templateId", ""]] call _dbLoadouts;
-				//_requestedPlayerUid = ["read", [_x, "playerId", ""]] call _dbLoadouts;
-				_setupTimeStamp = ["read", [_x, "setupTimeStamp", [0, 0, 0, 0, 0, 0]]] call _dbLoadouts;
-				_setupLoadoutName = ["read", [_x, "setupLoadoutName", []]] call _dbLoadouts;
-				_setupLoadout = ["read", [_x, "setupLoadout", []]] call _dbLoadouts;
+				_dbName = "ppl-loadouts-" + _x + "-" + _requestedPlayerUid;
+				_dbLoadouts = ["new", _dbName] call OO_INIDBI;
 				
-				_filteredLoadouts = _filteredLoadouts + [[_setupTimeStamp, _loadoutId, _setupLoadoutName]];
+				if ("exists" call _dbLoadouts) then
+				{
+					_loadouts = "getSections" call _dbLoadouts;
+
+					{
+						_loadoutId = ["read", [_x, "loadoutId", ""]] call _dbLoadouts;
+						//_requestedTemplateId = ["read", [_x, "templateId", ""]] call _dbLoadouts;
+						//_requestedPlayerUid = ["read", [_x, "playerId", ""]] call _dbLoadouts;
+						_setupTimeStamp = ["read", [_x, "setupTimeStamp", [0, 0, 0, 0, 0, 0]]] call _dbLoadouts;
+						_setupLoadoutName = ["read", [_x, "setupLoadoutName", []]] call _dbLoadouts;
+						_setupLoadout = ["read", [_x, "setupLoadout", []]] call _dbLoadouts;
+						
+						_requestedLoadouts = _requestedLoadouts + [[_setupTimeStamp, _loadoutId, _setupLoadoutName]];
+							
+					} forEach _loadouts;
+				};
+			} forEach _requestedTemplates;
+
+			/* ---------------------------------------- */
+
+			_result = [_playerUid, _clientId, _isAdmin, _isAdminLoggedIn, _requestedLoadouts];
+			
+			_answer = _playerUid + "-answerLoadouts";
+			missionNamespace setVariable [_answer, _result, false];
+			_clientId publicVariableClient _answer;
 					
-			} forEach _loadouts;
+			[format ["[%1] PPL Player Request Loadouts: (%2)", serverTime, _requestedPlayerUid]] call PPL_fnc_log;
 		};
-
-		/* ---------------------------------------- */
-
-		_result = [_playerUid, _clientId, _isAdmin, _isAdminLoggedIn, _filteredLoadouts];
-		
-		_answer = _playerUid + "-answerLoadoutsFiltered";
-		missionNamespace setVariable [_answer, _result, false];
-		_clientId publicVariableClient _answer;
-				
-		[format ["[%1] PPL Player Request Loadouts Filtered: (%2)", serverTime, _requestedPlayerUid]] call PPL_fnc_log;
 	};
 };
 
 /* ================================================================================ */
 
-(_playerUid + "-requestTemplatesFiltered") addPublicVariableEventHandler
+(_playerUid + "-requestTemplates") addPublicVariableEventHandler
 {
 	params ["_broadcastVariableName", "_broadcastVariableValue", "_broadcastVariableTarget"];
 	
 	_playerUid = _broadcastVariableValue select 0;
 	_clientId = _broadcastVariableValue select 1;
-	_filterTemplates = _broadcastVariableValue select 2;
 
 	/* ---------------------------------------- */
 
@@ -540,7 +552,7 @@ params ["_playerUid"];
 	_dbName = "ppl-templates";
 	_dbTemplates = ["new", _dbName] call OO_INIDBI;
 	
-	_filteredTemplates = [];
+	_requestedTemplates = [];
 	if ("exists" call _dbTemplates) then
 	{
 		_templates = "getSections" call _dbTemplates;
@@ -548,20 +560,20 @@ params ["_playerUid"];
 			_templateId = ["read", [_x, "templateId", 0]] call _dbTemplates;
 			_templateName = ["read", [_x, "templateName", ""]] call _dbTemplates;
 			
-			_filteredTemplates = _filteredTemplates + [[_templateId, _templateName]];
+			_requestedTemplates = _requestedTemplates + [[_templateName, _templateId]];
 			
 		} forEach _templates;
 	};
 
 	/* ---------------------------------------- */
 
-	_result = [_playerUid, _clientId, _isAdmin, _isAdminLoggedIn, _filteredTemplates];
+	_result = [_playerUid, _clientId, _isAdmin, _isAdminLoggedIn, _requestedTemplates];
 	
-	_answer = _playerUid + "-answerTemplatesFiltered";
+	_answer = _playerUid + "-answerTemplates";
 	missionNamespace setVariable [_answer, _result, false];
 	_clientId publicVariableClient _answer;
 
-	[format ["[%1] PPL Player Request Templates Filtered: (%2)", serverTime, _playerUid]] call PPL_fnc_log;
+	[format ["[%1] PPL Player Request Templates: (%2)", serverTime, _playerUid]] call PPL_fnc_log;
 };
 
 /* ================================================================================ */
@@ -608,7 +620,6 @@ params ["_playerUid"];
 	
 	_playerUid = _broadcastVariableValue select 0;
 	_clientId = _broadcastVariableValue select 1;
-	_filterPlayers = _broadcastVariableValue select 2;
 
 	/* ---------------------------------------- */
 
@@ -651,7 +662,7 @@ params ["_playerUid"];
 	_players = "getSections" call _dbPlayers;
 	_countPlayersTotal = count _players;
 	
-	_filteredPlayers = [];
+	_requestedPlayers = [];
 	_playerOnly = [];
 	{
 		_tmpPlayerName = ["read", [_x, "playerName", ""]] call _dbPlayers;
@@ -663,14 +674,14 @@ params ["_playerUid"];
 		_tmpPlayerStatus = false;
 		if ((_allActivePlayersIds find _tmpPlayerUid) > -1) then {_tmpPlayerStatus = true;};
 		
-		_filteredPlayers = _filteredPlayers + [[_tmpPlayerName, _tmpPlayerUid, _tmpIsAdmin, _tmpIsAdminLoggedIn, _tmpPlayerStatus]];
+		_requestedPlayers = _requestedPlayers + [[_tmpPlayerName, _tmpPlayerUid, _tmpIsAdmin, _tmpIsAdminLoggedIn, _tmpPlayerStatus]];
 		if (_tmpPlayerUid == _playerUid) then
 		{
 			_playerOnly = [[_tmpPlayerName, _tmpPlayerUid, _tmpIsAdmin, _tmpIsAdminLoggedIn, _tmpPlayerStatus]];
 		};
 	} forEach _players;
 	
-	if (!_isAdminLoggedIn) then {_filteredPlayers = _playerOnly;};
+	if (!_isAdminLoggedIn) then {_requestedPlayers = _playerOnly;};
 
 	/* ---------------------------------------- */
 
@@ -678,7 +689,7 @@ params ["_playerUid"];
 	[
 		_playerUid, _clientId, _isAdmin, _isAdminLoggedIn,  
 		_countPlayersTotal, _countPlayersOnline, _countAdminsTotal, _countAdminsOnline, _countTemplatesTotal, 
-		_filteredPlayers
+		_requestedPlayers
 	];
 	
 	_answer = _playerUid + "-answerDialogUpdate";

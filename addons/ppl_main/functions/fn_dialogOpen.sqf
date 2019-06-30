@@ -37,15 +37,15 @@ if (hasInterface ) then
 		
 		/* ---------------------------------------- */
 		
-		_filterPlayersEditBox = _pplDialog displayCtrl 1400;
-		_filterPlayersEditBox ctrlAddEventHandler ["SetFocus",
+		_playersFilterEditBox = _pplDialog displayCtrl 1400;
+		_playersFilterEditBox ctrlAddEventHandler ["SetFocus",
 		{
 			params ["_control"];
 			
 			_pplDialog = (findDisplay 24984);
 			_pplDialog displayRemoveAllEventHandlers "KeyUp";
 		}];
-		_filterPlayersEditBox ctrlAddEventHandler ["KillFocus",
+		_playersFilterEditBox ctrlAddEventHandler ["KillFocus",
 		{
 			params ["_control"];
 			
@@ -73,15 +73,15 @@ if (hasInterface ) then
 
 		/* ---------------------------------------- */
 		
-		_filterLoadoutsEditBox = _pplDialog displayCtrl 1402;
-		_filterLoadoutsEditBox ctrlAddEventHandler ["SetFocus",
+		_loadoutsFilterEditBox = _pplDialog displayCtrl 1402;
+		_loadoutsFilterEditBox ctrlAddEventHandler ["SetFocus",
 		{
 			params ["_control"];
 			
 			_pplDialog = (findDisplay 24984);
 			_pplDialog displayRemoveAllEventHandlers "KeyUp";
 		}];
-		_filterLoadoutsEditBox ctrlAddEventHandler ["KillFocus",
+		_loadoutsFilterEditBox ctrlAddEventHandler ["KillFocus",
 		{
 			params ["_control"];
 			

@@ -29,35 +29,30 @@ _playersListBox ctrlAddEventHandler ["LBSelChanged",
 	{
 		_templatesListBox = (findDisplay 24984) displayCtrl 1501;
 		_selectedTemplateIndex = lbCurSel _templatesListBox;
+		_requestedPlayerUid = _control lbData _selectedIndex;
 		
-		if (_selectedTemplateIndex != -1) then
+		_requestedTemplateId = "";
+		if (_selectedTemplateIndex != -1) then {_requestedTemplateId = _templatesListBox lbData _selectedTemplateIndex;};
+		
+		_playerUid = getPlayerUID player;
+		_clientId = clientOwner;
+		
+		_text = _control lbText _selectedIndex;
+		
+		_promoteButton = (findDisplay 24984) displayCtrl 1610;
+
+		if ((_text find (localize "STR_PPL_Main_Admin")) > -1) then
 		{
-			_requestedTemplateId = _templatesListBox lbData _selectedTemplateIndex;
-			
-			_requestedPlayerUid = _control lbData _selectedIndex;
-			
-			_playerUid = getPlayerUID player;
-			_clientId = clientOwner;
-			
-			_text = _control lbText _selectedIndex;
-			
-			_promoteButton = (findDisplay 24984) displayCtrl 1610;
-
-			if ((_text find (localize "STR_PPL_Main_Admin")) > -1) then
-			{
-				_promoteButton ctrlSetText localize "STR_PPL_Main_Dialog_Button_Degrade";
-			}
-			else
-			{
-				_promoteButton ctrlSetText localize "STR_PPL_Main_Dialog_Button_Promote";
-			};
-
-			_filterLoadouts = "";
-		
-			_request = _playerUid + "-requestLoadoutsFiltered";
-			missionNamespace setVariable [_request, [_playerUid, _clientId, _requestedPlayerUid, _requestedTemplateId, _filterLoadouts], false];
-			publicVariableServer _request;
+			_promoteButton ctrlSetText localize "STR_PPL_Main_Dialog_Button_Degrade";
+		}
+		else
+		{
+			_promoteButton ctrlSetText localize "STR_PPL_Main_Dialog_Button_Promote";
 		};
+	
+		_request = _playerUid + "-requestLoadouts";
+		missionNamespace setVariable [_request, [_playerUid, _clientId, _requestedPlayerUid, _requestedTemplateId], false];
+		publicVariableServer _request;
 	};
 }];
 
@@ -68,26 +63,21 @@ _templatesListBox ctrlAddEventHandler ["LBSelChanged",
 {
 	params ["_control", "_selectedIndex"];
 
-	if (_selectedIndex != -1) then
+	_playersListBox = (findDisplay 24984) displayCtrl 1500;
+	_selectedPlayerIndex = lbCurSel _playersListBox;
+	
+	if (_selectedPlayerIndex != -1) then
 	{
-		_playersListBox = (findDisplay 24984) displayCtrl 1500;
-		_selectedPlayerIndex = lbCurSel _playersListBox;
+		_requestedPlayerUid = _playersListBox lbData _selectedPlayerIndex;
 		
-		if (_selectedPlayerIndex != -1) then
-		{
-			_requestedPlayerUid = _playersListBox lbData _selectedPlayerIndex;
-			
-			_requestedTemplateId = _control lbData _selectedIndex;
-			
-			_playerUid = getPlayerUID player;
-			_clientId = clientOwner;
-			
-			_filterLoadouts = "";
+		_requestedTemplateId = _control lbData _selectedIndex;
 		
-			_request = _playerUid + "-requestLoadoutsFiltered";
-			missionNamespace setVariable [_request, [_playerUid, _clientId, _requestedPlayerUid, _requestedTemplateId, _filterLoadouts], false];
-			publicVariableServer _request;
-		};
+		_playerUid = getPlayerUID player;
+		_clientId = clientOwner;
+	
+		_request = _playerUid + "-requestLoadouts";
+		missionNamespace setVariable [_request, [_playerUid, _clientId, _requestedPlayerUid, _requestedTemplateId], false];
+		publicVariableServer _request;
 	};
 }];
 
@@ -106,8 +96,8 @@ _loadoutsListBox ctrlAddEventHandler ["LBSelChanged",
 
 /* ================================================================================ */
 
-_filterPlayersEditBox = (findDisplay 24984) displayCtrl 1400;
-_filterPlayersEditBox ctrlAddEventHandler ["KeyUp",
+_playersFilterEditBox = (findDisplay 24984) displayCtrl 1400;
+_playersFilterEditBox ctrlAddEventHandler ["KeyUp",
 {
 	params ["_displayorcontrol", "_key", "_shift", "_ctrl", "_alt"];
 
@@ -116,8 +106,8 @@ _filterPlayersEditBox ctrlAddEventHandler ["KeyUp",
 		_playerUid = getPlayerUID player;
 		_clientId = clientOwner;
 		
-		_filterPlayersEditBox = (findDisplay 24984) displayCtrl 1400;
-		_filterPlayers = ctrlText _filterPlayersEditBox;
+		_playersFilterEditBox = (findDisplay 24984) displayCtrl 1400;
+		_playersFilter = ctrlText _playersFilterEditBox;
 	
 		_playersListBox = (findDisplay 24984) displayCtrl 1500;
 		lbClear _playersListBox;
@@ -127,7 +117,7 @@ _filterPlayersEditBox ctrlAddEventHandler ["KeyUp",
 			_text = _x select 0;
 			_data = _x select 1;
 			
-			if (((toLower _text) find (toLower _filterPlayers)) > -1) then
+			if (((toLower _text) find (toLower _playersFilter)) > -1) then
 			{
 				_index = _playersListBox lbAdd _text;
 				_playersListBox lbSetData [_index, _data];
@@ -155,7 +145,7 @@ _templatesFilterEditBox ctrlAddEventHandler ["KeyUp",
 		_clientId = clientOwner;
 
 		_templatesFilterEditBox = (findDisplay 24984) displayCtrl 1401;
-		_filterTemplates = ctrlText _templatesFilterEditBox;
+		_templatesFilter = ctrlText _templatesFilterEditBox;
 
 		_templatesListBox = (findDisplay 24984) displayCtrl 1501;
 		lbClear _templatesListBox;
@@ -165,7 +155,7 @@ _templatesFilterEditBox ctrlAddEventHandler ["KeyUp",
 			_text = _x select 0;
 			_data = _x select 1;
 			
-			if (((toLower _text) find (toLower _filterTemplates)) > -1) then
+			if (((toLower _text) find (toLower _templatesFilter)) > -1) then
 			{
 				_index = _templatesListBox lbAdd _text;
 				_templatesListBox lbSetData [_index, _data];
@@ -176,12 +166,12 @@ _templatesFilterEditBox ctrlAddEventHandler ["KeyUp",
 
 /* ================================================================================ */
 
-_filterLoadoutsEditBox = (findDisplay 24984) displayCtrl 1402;
-_filterLoadoutsEditBox ctrlAddEventHandler ["KeyUp",
+_loadoutsFilterEditBox = (findDisplay 24984) displayCtrl 1402;
+_loadoutsFilterEditBox ctrlAddEventHandler ["KeyUp",
 {
 	params ["_displayorcontrol", "_key", "_shift", "_ctrl", "_alt"];
 
-	_filterLoadoutsEditBox = (findDisplay 24984) displayCtrl 1402;
+	_loadoutsFilterEditBox = (findDisplay 24984) displayCtrl 1402;
 
 	_playersListBox = (findDisplay 24984) displayCtrl 1500;
 	_selectedPlayerIndex = lbCurSel _playersListBox;
@@ -194,7 +184,7 @@ _filterLoadoutsEditBox ctrlAddEventHandler ["KeyUp",
 	{
 		_playerUid = getPlayerUID player;
 		_clientId = clientOwner;
-		_filterLoadouts = ctrlText _filterLoadoutsEditBox;
+		_loadoutsFilter = ctrlText _loadoutsFilterEditBox;
 		
 		_loadoutsListBox = (findDisplay 24984) displayCtrl 1502;
 		lbClear _loadoutsListBox;
@@ -204,7 +194,7 @@ _filterLoadoutsEditBox ctrlAddEventHandler ["KeyUp",
 			_text = _x select 0;
 			_data = _x select 1;
 			
-			if (((toLower _text) find (toLower _filterLoadouts)) > -1) then
+			if (((toLower _text) find (toLower _loadoutsFilter)) > -1) then
 			{
 				_index = _loadoutsListBox lbAdd _text;
 				_loadoutsListBox lbSetData [_index, _data];
@@ -235,7 +225,7 @@ _answer addPublicVariableEventHandler
 	_countAdminsTotal = _broadcastVariableValue select 6;
 	_countAdminsOnline = _broadcastVariableValue select 7;
 	_countTemplatesTotal = _broadcastVariableValue select 8;
-	_filteredPlayers = _broadcastVariableValue select 9;
+	_players = _broadcastVariableValue select 9;
 
 	_statusServer = false;
 	if (!isNil "PPL_statusServer") then {_statusServer =  PPL_statusServer;};
@@ -263,8 +253,8 @@ _answer addPublicVariableEventHandler
 	_templateDeleteButton = (findDisplay 24984) displayCtrl 1608;
 	_promoteButton = (findDisplay 24984) displayCtrl 1610;
 	
-	_filterPlayersEditBox = (findDisplay 24984) displayCtrl 1400;
-	_filterPlayers = ctrlText _filterPlayersEditBox;
+	_playersFilterEditBox = (findDisplay 24984) displayCtrl 1400;
+	_playersFilter = ctrlText _playersFilterEditBox;
 	
 	if (_statusServer) then {_statusServer = localize "STR_PPL_Main_Online"} else {_statusServer = localize "STR_PPL_Main_Offline"};
 	if (_statusDatabase) then {_statusDatabase = localize "STR_PPL_Main_Online"} else {_statusDatabase = localize "STR_PPL_Main_Offline"};
@@ -301,7 +291,7 @@ _answer addPublicVariableEventHandler
 
 	PPL_lbPlayersContent = [];
 
-	_filteredPlayers sort true;
+	_players sort true;
 	{
 		_dbPlayerName = _x select 0;
 		_dbPlayerUid = _x select 1;
@@ -317,7 +307,7 @@ _answer addPublicVariableEventHandler
 		
 		_playerText = format ["%1 (%2%3%4)",_dbPlayerName, _dbPlayerIsAdmin, _dbPlayerStatus, _dbPlayerIsAdminLoggedIn];
 
-		if ((((toLower _playerText) find (toLower _filterPlayers)) > -1) || (_filterPlayers == "")) then
+		if ((((toLower _playerText) find (toLower _playersFilter)) > -1) || (_playersFilter == "")) then
 		{
 			_index = _playersListBox lbAdd _playerText;	
 			_playersListBox lbSetData [_index, _dbPlayerUid];
@@ -331,14 +321,14 @@ _answer addPublicVariableEventHandler
 		
 		PPL_lbPlayersContent = PPL_lbPlayersContent + [[_playerText, _dbPlayerUid]];
 		
-	} forEach _filteredPlayers;
+	} forEach _players;
 	
 	ctrlSetFocus _playersListBox;
 };
 
 /* ================================================================================ */
 
-_answer = _playerUid + "-answerTemplatesFiltered";
+_answer = _playerUid + "-answerTemplates";
 _answer addPublicVariableEventHandler
 {
 	params ["_broadcastVariableName", "_broadcastVariableValue", "_broadcastVariableTarget"];
@@ -347,25 +337,25 @@ _answer addPublicVariableEventHandler
 	_clientId = _broadcastVariableValue select 1;	
 	_isAdmin = _broadcastVariableValue select 2;
 	_isAdminLoggedIn = _broadcastVariableValue select 3;
-	_filteredTemplates = _broadcastVariableValue select 4;
+	_templates = _broadcastVariableValue select 4;
 	
 	_templatesListBox = (findDisplay 24984) displayCtrl 1501;
 	lbClear _templatesListBox;
 	_templatesListBox lbSetCurSel -1;
 	
 	_templatesFilterEditBox = (findDisplay 24984) displayCtrl 1401;
-	_filterTemplates = ctrlText _templatesFilterEditBox;
+	_templatesFilter = ctrlText _templatesFilterEditBox;
 
 	PPL_lbTemplatesContent = [];
 
-	_filteredTemplates sort true;
+	_templates sort true;
 	{
-		_dbTemplateId = _x select 0;
-		_dbTemplateName = _x select 1;
+		_dbTemplateName = _x select 0;
+		_dbTemplateId = _x select 1;
 		
 		_templateText = format ["%1", _dbTemplateName];
 
-		if ((((toLower _templateText) find (toLower _filterTemplates)) > -1) || (_filterTemplates == "")) then
+		if ((((toLower _templateText) find (toLower _templatesFilter)) > -1) || (_templatesFilter == "")) then
 		{
 			_index = _templatesListBox lbAdd _templateText;	
 			_templatesListBox lbSetData [_index, _dbTemplateId];
@@ -373,14 +363,14 @@ _answer addPublicVariableEventHandler
 		
 		PPL_lbTemplatesContent = PPL_lbTemplatesContent + [[_templateText, _dbTemplateId]];
 	
-	} forEach _filteredTemplates;
+	} forEach _templates;
 	
 	ctrlSetFocus _templatesListBox;
 };
 
 /* ================================================================================ */
 
-_answer = _playerUid + "-answerLoadoutsFiltered";
+_answer = _playerUid + "-answerLoadouts";
 _answer addPublicVariableEventHandler
 {
 	params ["_broadcastVariableName", "_broadcastVariableValue", "_broadcastVariableTarget"];
@@ -389,18 +379,18 @@ _answer addPublicVariableEventHandler
 	_clientId = _broadcastVariableValue select 1;	
 	_isAdmin = _broadcastVariableValue select 2;
 	_isAdminLoggedIn = _broadcastVariableValue select 3;
-	_filteredLoadouts = _broadcastVariableValue select 4;
+	_loadouts = _broadcastVariableValue select 4;
 
 	_loadoutsListBox = (findDisplay 24984) displayCtrl 1502;
 	lbClear _loadoutsListBox;
 	_loadoutsListBox lbSetCurSel -1;
 	
-	_filterLoadoutsEditBox = (findDisplay 24984) displayCtrl 1402;
-	_filterLoadouts = ctrlText _filterLoadoutsEditBox;
+	_loadoutsFilterEditBox = (findDisplay 24984) displayCtrl 1402;
+	_loadoutsFilter = ctrlText _loadoutsFilterEditBox;
 	
 	PPL_lbLoadoutsContent = [];
 	
-	_filteredLoadouts sort false;
+	_loadouts sort false;
 	{
 		_dbSetupTimeStamp = _x select 0;
 		_dbLoadoutId = _x select 1;
@@ -417,7 +407,7 @@ _answer addPublicVariableEventHandler
 		
 		_loadoutText = _dateString + " " + _dbSetupLoadoutName;
 		
-		if ((((toLower _loadoutText) find (toLower _filterLoadouts)) > -1) || (_filterLoadouts == "")) then
+		if ((((toLower _loadoutText) find (toLower _loadoutsFilter)) > -1) || (_loadoutsFilter == "")) then
 		{
 			_index = _loadoutsListBox lbAdd _loadoutText;
 			_loadoutsListBox lbSetData [_index, _dbLoadoutId];
@@ -425,7 +415,7 @@ _answer addPublicVariableEventHandler
 		
 		PPL_lbLoadoutsContent = PPL_lbLoadoutsContent + [[_loadoutText, _dbLoadoutId]];
 		
-	} forEach _filteredLoadouts;
+	} forEach _loadouts;
 };
 
 /* ================================================================================ */
