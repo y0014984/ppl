@@ -264,7 +264,7 @@ params ["_playerUid"];
 			{
 				_x setUnitLoadout [_templateLoadout, false];
 				
-				["write", [_requestedPlayerUid, "activeTemplate", _requestedTemplateId]] call _dbPlayers;
+				["write", [_requestedPlayerUid, "activeLoadout", _requestedLoadoutId]] call _dbPlayers;
 				
 				_dbName = "ppl-loadouts-" + _requestedTemplateId + "-" + _requestedPlayerUid;
 				_dbLoadouts = ["new", _dbName] call OO_INIDBI;
@@ -286,6 +286,8 @@ params ["_playerUid"];
 				["write", [_loadoutId, "actualTimeStamp", _setupTimeStamp]] call _dbLoadouts;
 				["write", [_loadoutId, "actualLoadoutName", _templateName]] call _dbLoadouts;
 				["write", [_loadoutId, "actualLoadout", _templateLoadout]] call _dbLoadouts;
+				
+				["STR_PPL_Main_Notifications_Template_Loaded", _templateName] remoteExecCall ["PPL_fnc_hintLocalized", _clientId];
 			};
 		} forEach _allPlayerObj;
 
@@ -343,7 +345,7 @@ params ["_playerUid"];
 		["write", [_templateId, "templateName", _templateName]] call _dbTemplates;
 		["write", [_templateId, "templateLoadout", _templateLoadout]] call _dbTemplates;
 
-		["STR_PPL_Main_Notifications_Template_Saved", _templateName] remoteExecCall ["PPL_fnc_hintLocalized"];
+		["STR_PPL_Main_Notifications_Template_Saved", _templateName] remoteExecCall ["PPL_fnc_hintLocalized", _clientId];
 			
 		_result = true;
 		
@@ -499,6 +501,8 @@ params ["_playerUid"];
 					_x setUnitLoadout [_loadout, false];
 					
 					["write", [_requestedPlayerUid, "activeLoadout", _requestedLoadoutId]] call _dbPlayers;
+					
+					["STR_PPL_Main_Notifications_Loadout_Assigned"] remoteExecCall ["PPL_fnc_hintLocalized", _clientId];
 				};
 			} forEach _allPlayerObj;
 		};
@@ -563,6 +567,8 @@ params ["_playerUid"];
 
 									["write", [_requestedLoadoutId, "actualLoadout", _newLoadout]] call _dbLoadouts;
 									["write", [_requestedLoadoutId, "actualTimeStamp", _newTimeStamp]] call _dbLoadouts;
+									
+									["STR_PPL_Main_Notifications_Loadout_Updated"] remoteExecCall ["PPL_fnc_hintLocalized", _clientId];
 								};
 							};
 						} forEach _allPlayerObj;
@@ -686,6 +692,8 @@ params ["_playerUid"];
 	{
 		if ((_playerUid == _requestedPlayerUid) || (_isAdmin && _isAdminLoggedIn)) then
 		{
+			_activeLoadout = ["read", [_requestedPlayerUid, "activeLoadout", ""]] call _dbPlayers;
+			
 			_requestedLoadouts = [];	
 			{
 				_dbName = "ppl-loadouts-" + _x + "-" + _requestedPlayerUid;
@@ -710,7 +718,7 @@ params ["_playerUid"];
 
 			/* ---------------------------------------- */
 
-			_result = [_playerUid, _clientId, _isAdmin, _isAdminLoggedIn, _requestedLoadouts];
+			_result = [_playerUid, _clientId, _isAdmin, _isAdminLoggedIn, _activeLoadout, _requestedLoadouts];
 			
 			_answer = _playerUid + "-answerLoadouts";
 			missionNamespace setVariable [_answer, _result, false];
@@ -790,6 +798,8 @@ params ["_playerUid"];
 	if (!_isAdmin && (_serverAdminStatus == 2)) then
 	{
 		["write", [_playerUid, "isAdmin", true]] call _dbPlayers;
+		_playerName = ["read", [_playerUid, "playerName", false]] call _dbPlayers;
+		["STR_PPL_Main_Notifications_Player_Promoted", _playerName] remoteExecCall ["PPS_fnc_hintLocalized"];
 	};
 
 	/* ---------------------------------------- */
@@ -861,14 +871,15 @@ params ["_playerUid"];
 		_tmpIsAdmin = ["read", [_x, "isAdmin", false]] call _dbPlayers;
 		if (_tmpIsAdmin) then {_countAdminsTotal = _countAdminsTotal + 1};
 		_tmpIsAdminLoggedIn = ["read", [_x, "isAdminLoggedIn", false]] call _dbPlayers;
+		_tmpActiveLoadout = ["read", [_x, "activeLoadout", ""]] call _dbPlayers;
 		
 		_tmpPlayerStatus = false;
 		if ((_allActivePlayersIds find _tmpPlayerUid) > -1) then {_tmpPlayerStatus = true;};
 		
-		_requestedPlayers = _requestedPlayers + [[_tmpPlayerName, _tmpPlayerUid, _tmpIsAdmin, _tmpIsAdminLoggedIn, _tmpPlayerStatus]];
+		_requestedPlayers = _requestedPlayers + [[_tmpPlayerName, _tmpPlayerUid, _tmpIsAdmin, _tmpIsAdminLoggedIn, _tmpPlayerStatus, _tmpActiveLoadout]];
 		if (_tmpPlayerUid == _playerUid) then
 		{
-			_playerOnly = [[_tmpPlayerName, _tmpPlayerUid, _tmpIsAdmin, _tmpIsAdminLoggedIn, _tmpPlayerStatus]];
+			_playerOnly = [[_tmpPlayerName, _tmpPlayerUid, _tmpIsAdmin, _tmpIsAdminLoggedIn, _tmpPlayerStatus, _tmpActiveLoadout]];
 		};
 	} forEach _players;
 	

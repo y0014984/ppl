@@ -304,6 +304,7 @@ _answer addPublicVariableEventHandler
 		_dbPlayerIsAdmin = _x select 2;
 		_dbPlayerIsAdminLoggedIn = _x select 3;
 		_dbPlayerStatus = _x select 4;
+		_dbActiveLoadout = _x select 5;
 		
 		if (_dbPlayerIsAdmin) then {_dbPlayerIsAdmin = localize "STR_PPL_Main_Admin";} else {_dbPlayerIsAdmin = localize "STR_PPL_Main_Player";};
 
@@ -311,7 +312,9 @@ _answer addPublicVariableEventHandler
 
 		if (_dbPlayerIsAdminLoggedIn) then {_dbPlayerIsAdminLoggedIn = " " + (localize "STR_PPL_Main_Logged_In");} else {_dbPlayerIsAdminLoggedIn = "";};
 		
-		_playerText = format ["%1 (%2%3%4)",_dbPlayerName, _dbPlayerIsAdmin, _dbPlayerStatus, _dbPlayerIsAdminLoggedIn];
+		if (_dbActiveLoadout == "") then {_dbActiveLoadout = " " + (localize "STR_PPL_Main_No_Loadout");} else {_dbActiveLoadout = "";};;
+		
+		_playerText = format ["%1 (%2%3%4)%5",_dbPlayerName, _dbPlayerIsAdmin, _dbPlayerStatus, _dbPlayerIsAdminLoggedIn, _dbActiveLoadout];
 
 		if ((((toLower _playerText) find (toLower _playersFilter)) > -1) || (_playersFilter == "")) then
 		{
@@ -385,7 +388,8 @@ _answer addPublicVariableEventHandler
 	_clientId = _broadcastVariableValue select 1;	
 	_isAdmin = _broadcastVariableValue select 2;
 	_isAdminLoggedIn = _broadcastVariableValue select 3;
-	_loadouts = _broadcastVariableValue select 4;
+	_activeLoadout = _broadcastVariableValue select 4;
+	_loadouts = _broadcastVariableValue select 5;
 
 	_loadoutsListBox = (findDisplay 24984) displayCtrl 1502;
 	lbClear _loadoutsListBox;
@@ -422,12 +426,21 @@ _answer addPublicVariableEventHandler
 		
 		_dateStringActual = format ["%1-%2-%3", _year, _month, _day];
 		
-		_loadoutText = _dateStringSetup + " " + _dbSetupLoadoutName + " (" + _dateStringActual + ")";
+		_isActiveString = "";
+		if (_activeLoadout == _dbLoadoutId) then {_isActiveString = " " + (localize "STR_PPL_Main_Active");};
+		
+		_loadoutText = _dateStringSetup + " " + _dbSetupLoadoutName + " (" + _dateStringActual + _isActiveString + ")";
 		
 		if ((((toLower _loadoutText) find (toLower _loadoutsFilter)) > -1) || (_loadoutsFilter == "")) then
 		{
 			_index = _loadoutsListBox lbAdd _loadoutText;
 			_loadoutsListBox lbSetData [_index, _dbLoadoutId];
+			
+			if (_isActiveString != "") then
+			{
+				_loadoutsListBox lbSetColor [_index, [1, 0.5, 0.5, 1]];
+				_loadoutsListBox lbSetCurSel _index;
+			};
 		};
 		
 		PPL_lbLoadoutsContent = PPL_lbLoadoutsContent + [[_loadoutText, _dbLoadoutId]];

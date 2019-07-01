@@ -14,6 +14,14 @@
 				<English>Offline</English>
 				<German>Offline</German>
 			</Key>
+			<Key ID="STR_PPL_Main_Active">
+				<English>Active</English>
+				<German>Aktiv</German>
+			</Key>
+			<Key ID="STR_PPL_Main_No_Loadout">
+				<English>No loadout</English>
+				<German>Keine Ausrüstung</German>
+			</Key>
 			<Key ID="STR_PPL_Main_Admin">
 				<English>Admin</English>
 				<German>Admin</German>
@@ -140,94 +148,6 @@
 				<English>PPL server settings</English>
 				<German>PPL Server Einstellungen</German>
 			</Key>
-			<Key ID="STR_PPL_Main_Settings_Update_Interval">
-				<English>Update Interval</English>
-				<German>Aktualierungsintervall</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Settings_Update_Interval_Description">
-				<English>The duration between 2 updates, the client is sending to server.</English>
-				<German>Die Dauer in Sekunden zwischen 2 Updates, die der Client an den Server sendet.</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Settings_Update_Interval_Value_5_sec">
-				<English>5 sec</English>
-				<German>5s</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Settings_Update_Interval_Value_5_sec_long">
-				<English>5 seconds</English>
-				<German>5 Sekunden</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Settings_Update_Interval_Value_10_sec">
-				<English>10 sec</English>
-				<German>10s</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Settings_Update_Interval_Value_10_sec_long">
-				<English>10 seconds</English>
-				<German>10 Sekunden</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Settings_Update_Interval_Value_15_sec">
-				<English>15 sec</English>
-				<German>15s</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Settings_Update_Interval_Value_15_sec_long">
-				<English>15 seconds</English>
-				<German>15 Sekunden</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Settings_Allow_Sending_Data">
-				<English>allow sending data</English>
-				<German>Daten senden erlauben</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Settings_Allow_Sending_Data_Description">
-				<English>Data is only send to server if this option is checked.</English>
-				<German>Nur wenn diese Einstellung aktiv ist werden Daten an den Server gesendet.</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Settings_Sending_General_Data">
-				<English>sending general data</English>
-				<German>Allgemeine Daten senden</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Settings_Sending_General_Data_Description">
-				<English>General data is all data that does not fit in another category.</English>
-				<German>Allgemeine Daten sind ebenjene, die in keine andere Kategorie passen.</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Settings_Sending_Infantry_Data">
-				<English>sending infantry data</English>
-				<German>Infantriedaten senden</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Settings_Sending_Infantry_Data_Description">
-				<English>Infantry data is all infantry based data.</English>
-				<German>Infantriedaten sind alle infatriebezogenen Daten.</German>
-			</Key>	
-			<Key ID="STR_PPL_Main_Settings_Sending_Vehicle_Data">
-				<English>sending vehicle data</English>
-				<German>Fahrzeugdaten senden</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Settings_Sending_Vehicle_Data_Description">
-				<English>Vehicle data is all vehicle based data.</English>
-				<German>Fahrzeugdaten sind alle fahrzeugbezogenen Daten.</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Settings_Sending_Addon_Data">
-				<English>sending addon data</English>
-				<German>Addon-Daten senden</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Settings_Sending_Addon_Data_Description">
-				<English>Vehicle data is all data data collected by optional addons.</English>
-				<German>Addon-Daten sind alle Daten die durch optionale Addons gesammelt wurden.</German>
-			</Key>		
-			<Key ID="STR_PPL_Main_Settings_Timezone">
-				<English>timezone</English>
-				<German>Zeitzone</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Settings_Timezone_Description">
-				<English>Your timezone. Times and durations in game depend on this value.</English>
-				<German>Die Zeitzone, in der sie spielen. Hiervon hängen die Zeitangaben im PPL Menü ab.</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Settings_Daylight_Saving_Time">
-				<English>daylight saving time</English>
-				<German>Sommerzeit</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Settings_Daylight_Saving_Time_Description">
-				<English>Do you live in a country with saylight saving time?</English>
-				<German>Befinden sie sich in einem Land mit Sommerzeit?</German>
-			</Key>
 			<Key ID="STR_PPL_Main_Settings_Client_Logging">
 				<English>logging</English>
 				<German>Logging</German>
@@ -246,14 +166,6 @@
 			</Key>
 		</Container>
 		<Container name="Notifications">
-			<Key ID="STR_PPL_Main_Notifications_Missing_Template_Name">
-				<English>Persistent Player Loadout\n\nMissing template name.</English>
-				<German>Persistent Player Loadout\n\nName der Vorlage fehlt.</German>
-			</Key>
-			<Key ID="STR_PPL_Main_Notifications_Sending_Data_Not_Allowed">
-				<English>Persistent Player Loadout\n\nSending data not allowed. See mod settings.</English>
-				<German>Persistent Player Loadout\n\nDas Senden von Daten ist deaktiviert. Schau in die Mod-Einstellungen.</German>
-			</Key>
 			<Key ID="STR_PPL_Main_Notifications_Login_Denied_Too_Many_Admins">
 				<English>Persistent Player Loadout\n\nAdmin login denied. There ist another admin logged in.</English>
 				<German>Persistent Player Loadout\n\nAdmin Login verweigert. Es ist bereits ein Admin eingeloggt.</German>
@@ -262,9 +174,13 @@
 				<English>Persistent Player Loadout\n\nAdmin login denied. You have no admin permissions. Ask your server admin.</English>
 				<German>Persistent Player Loadout\n\nAdmin Login verweigert. Du hast keine Admin-Berechtigung. Frag deinen Server-Administrator.</German>
 			</Key>
+			<Key ID="STR_PPL_Main_Notifications_Template_Loaded">
+				<English>Persistent Player Loadout\n\nTemplate loaded for player: %1</English>
+				<German>Persistent Player Loadout\n\nVorlage für Spieler geladen: %1</German>
+			</Key>
 			<Key ID="STR_PPL_Main_Notifications_Template_Saved">
-				<English>Persistent Player Loadout\n\nTemplate saved: %1</English>
-				<German>Persistent Player Loadout\n\nVorlage wurde gesichert: %1</German>
+				<English>Persistent Player Loadout\n\nTemplate saved from player: %1</English>
+				<German>Persistent Player Loadout\n\nVorlage von Spieler gesichert: %1</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Notifications_Template_Renamed">
 				<English>Persistent Player Loadout\n\nTemplate renamed: %1</English>
@@ -286,9 +202,13 @@
 				<English>Persistent Player Loadout\n\nPlayer degraded: %1</English>
 				<German>Persistent Player Loadout\n\nSpieler wurde degradiert: %1</German>
 			</Key>
-			<Key ID="STR_PPL_Main_Notifications_Tracking">
-				<English>Persistent Player Loadout\n\nKey: %1\nValue: %2</English>
-				<German>Persistent Player Loadout\n\nSchlüssel: %1\nWert: %2</German>
+			<Key ID="STR_PPL_Main_Notifications_Loadout_Updated">
+				<English>Persistent Player Loadout\n\nLoadout updated.</English>
+				<German>Persistent Player Loadout\n\nAusrüstung aktualisiert.</German>
+			</Key>
+			<Key ID="STR_PPL_Main_Notifications_Loadout_Assigned">
+				<English>Persistent Player Loadout\n\nLoadout assigned.</English>
+				<German>Persistent Player Loadout\n\nAusrüstung zugewiesen.</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Notifications_Details">
 				<English>Persistent Player Loadout\nDetails\n\n%1</English>
@@ -297,6 +217,10 @@
 			<Key ID="STR_PPL_Main_Notifications_Loadout_Exported_To_Clipboard">
 				<English>Persistent Player Loadout\n\nLoadout exported to Clipboard.</English>
 				<German>Persistent Player Loadout\n\nAusrüstung in die Zwischenablage exportiert.</German>
+			</Key>
+			<Key ID="STR_PPL_Main_Notifications_Missing_Template_Name">
+				<English>Persistent Player Loadout\n\nMissing template name.</English>
+				<German>Persistent Player Loadout\n\nName der Vorlage fehlt.</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Notifications_No_Loadout_Selected">
 				<English>Persistent Player Loadout\n\nNo loadout selected.</English>
