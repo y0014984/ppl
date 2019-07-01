@@ -243,9 +243,9 @@ _answer addPublicVariableEventHandler
 	lbClear _playersListBox;
 	_playersListBox lbSetCurSel -1;
 	_adminButton = (findDisplay 24984) displayCtrl 1600;
-	_templatesText = (findDisplay 24984) displayCtrl 1007;
-	_templatesFilterEditBox = (findDisplay 24984) displayCtrl 1401;
-	_templatesListBox = (findDisplay 24984) displayCtrl 1501;
+	//_templatesText = (findDisplay 24984) displayCtrl 1007;
+	//_templatesFilterEditBox = (findDisplay 24984) displayCtrl 1401;
+	//_templatesListBox = (findDisplay 24984) displayCtrl 1501;
 	_templateEditBox = (findDisplay 24984) displayCtrl 1603;
 	_templateSaveButton = (findDisplay 24984) displayCtrl 1602;
 	_templateLoadButton = (findDisplay 24984) displayCtrl 1607;
@@ -267,9 +267,9 @@ _answer addPublicVariableEventHandler
 	if (_isAdminLoggedIn) then
 	{
 		_adminButton ctrlSetText localize "STR_PPL_Main_Dialog_Button_Logout";
-		_templatesText ctrlShow true;
-		_templatesFilterEditBox ctrlShow true;
-		_templatesListBox ctrlShow true;
+		//_templatesText ctrlShow true;
+		//_templatesFilterEditBox ctrlShow true;
+		//_templatesListBox ctrlShow true;
 		_templateEditBox ctrlShow true;
 		_templateSaveButton ctrlShow true;
 		_templateLoadButton ctrlShow true;
@@ -282,9 +282,9 @@ _answer addPublicVariableEventHandler
 	else
 	{
 		_adminButton ctrlSetText localize "STR_PPL_Main_Dialog_Button_Login";
-		_templatesText ctrlShow false;
-		_templatesFilterEditBox ctrlShow false;
-		_templatesListBox ctrlShow false;
+		//_templatesText ctrlShow false;
+		//_templatesFilterEditBox ctrlShow false;
+		//_templatesListBox ctrlShow false;
 		_templateEditBox ctrlShow false;
 		_templateSaveButton ctrlShow false;
 		_templateLoadButton ctrlShow false;

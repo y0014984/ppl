@@ -18,6 +18,7 @@
 
 _playerUid = getPlayerUID player;
 _playerName = name player;
+_clientId = clientOwner;
 
 /* ================================================================================ */
 
@@ -29,9 +30,11 @@ publicVariableServer "pplServerHelo";
 
 /* ================================================================================ */
 
-while {true} do
-{
-	// Do we something here?
-};
+_requestedPlayerUid = _playerUid;
+_requestedLoadoutId = "activeLoadout";
+
+_request = _playerUid + "-requestLoadoutAssign";
+missionNamespace setVariable [_request, [_playerUid, _clientId, _requestedPlayerUid, _requestedLoadoutId], false];
+publicVariableServer _request;
 
 /* ================================================================================ */

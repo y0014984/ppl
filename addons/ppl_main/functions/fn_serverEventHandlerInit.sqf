@@ -475,45 +475,50 @@ params ["_playerUid"];
 		
 		_templates = "getSections" call _dbTemplates;
 		
-		_loadout = [];
-		_loadoutName = "";
-		{
-			_dbName = "ppl-loadouts-" + _x + "-" + _requestedPlayerUid;
-			_dbLoadouts = ["new", _dbName] call OO_INIDBI;
-			
-			if ("exists" call _dbLoadouts) then
-			{
-				_tmpLoadout = ["read", [_requestedLoadoutId, "actualLoadout", []]] call _dbLoadouts;
-				_tmpLoadoutName = ["read", [_requestedLoadoutId, "actualLoadoutName", ""]] call _dbLoadouts;
-				if (!(_tmpLoadout isEqualTo [])) then {_loadout = _tmpLoadout;};
-				if (_tmpLoadoutName != "") then {_loadoutName = _tmpLoadoutName;};
-			};
-		} forEach _templates;
+		if (_requestedLoadoutId == "activeLoadout") then {_requestedLoadoutId = ["read", [_requestedPlayerUid, "activeLoadout", ""]] call _dbPlayers;};
 		
-		if (!(_loadout isEqualTo [])) then
-		{
-			_allPlayerObj = allPlayers;
+		if (_requestedLoadoutId != "") then
+		{	
+			_loadout = [];
+			_loadoutName = "";
 			{
-				_tmpPlayerUid = getPlayerUID _x;
-								
-				if (_tmpPlayerUid == _requestedPlayerUid) then
+				_dbName = "ppl-loadouts-" + _x + "-" + _requestedPlayerUid;
+				_dbLoadouts = ["new", _dbName] call OO_INIDBI;
+				
+				if ("exists" call _dbLoadouts) then
 				{
-					_x setUnitLoadout [_loadout, false];
-					
-					["write", [_requestedPlayerUid, "activeLoadout", _requestedLoadoutId]] call _dbPlayers;
-					
-					["STR_PPL_Main_Notifications_Loadout_Assigned"] remoteExecCall ["PPL_fnc_hintLocalized", _clientId];
+					_tmpLoadout = ["read", [_requestedLoadoutId, "actualLoadout", []]] call _dbLoadouts;
+					_tmpLoadoutName = ["read", [_requestedLoadoutId, "actualLoadoutName", ""]] call _dbLoadouts;
+					if (!(_tmpLoadout isEqualTo [])) then {_loadout = _tmpLoadout;};
+					if (_tmpLoadoutName != "") then {_loadoutName = _tmpLoadoutName;};
 				};
-			} forEach _allPlayerObj;
-		};
+			} forEach _templates;
+			
+			if (!(_loadout isEqualTo [])) then
+			{
+				_allPlayerObj = allPlayers;
+				{
+					_tmpPlayerUid = getPlayerUID _x;
+									
+					if (_tmpPlayerUid == _requestedPlayerUid) then
+					{
+						_x setUnitLoadout [_loadout, false];
+						
+						["write", [_requestedPlayerUid, "activeLoadout", _requestedLoadoutId]] call _dbPlayers;
+						
+						["STR_PPL_Main_Notifications_Loadout_Assigned"] remoteExecCall ["PPL_fnc_hintLocalized", _clientId];
+					};
+				} forEach _allPlayerObj;
+			};
 
-		_result = true;
-		
-		_answer = _playerUid + "-answerLoadoutAssign";
-		missionNamespace setVariable [_answer, _result, false];
-		_clientId publicVariableClient _answer;
-		
-		[format ["[%1] PPL Player Request Loadout Assign: %2 - %3 (%4)", serverTime, _loadoutName, _requestedPlayerUid, _playerUid]] call PPL_fnc_log;
+			_result = true;
+			
+			_answer = _playerUid + "-answerLoadoutAssign";
+			missionNamespace setVariable [_answer, _result, false];
+			_clientId publicVariableClient _answer;
+			
+			[format ["[%1] PPL Player Request Loadout Assign: %2 - %3 (%4)", serverTime, _loadoutName, _requestedPlayerUid, _playerUid]] call PPL_fnc_log;
+		};
 	};
 };
 
@@ -902,3 +907,51 @@ params ["_playerUid"];
 };
 
 /* ================================================================================ */
+
+//Triggered when player disconnects from the game. Similar to onPlayerDisconnected event but can be stacked and 
+//contains the unit occupied by player before disconnect. Must be added on the server and triggers only on the server.
+
+addMissionEventHandler ["HandleDisconnect",
+{
+	params ["_unit", "_id", "_uid", "_name"];
+
+	[format ["[%1] PPL TEST TEST TEST", serverTime]] call PPL_fnc_log;
+
+	_dbName = "ppl-players";
+	_dbPlayers = ["new", _dbName] call OO_INIDBI;
+	
+	_activeLoadoutId = ["read", [_uid, "activeLoadout", ""]] call _dbPlayers;
+	
+	if (_activeLoadoutId != "") then
+	{		
+		_dbName = "ppl-templates";
+		_dbTemplates = ["new", _dbName] call OO_INIDBI;
+		
+		_templates = "getSections" call _dbTemplates;
+		
+		{
+			_dbName = "ppl-loadouts-" + _x + "-" + _uid;
+			_dbLoadouts = ["new", _dbName] call OO_INIDBI;
+			
+			if ("exists" call _dbLoadouts) then
+			{
+				_loadouts = "getSections" call _dbLoadouts;
+				{
+					if (_x == _activeLoadoutId) then
+					{
+						_newLoadout = getUnitLoadout [_unit, false];
+						
+						_newTimeStamp = "getTimeStamp" call _dbLoadouts;
+
+						["write", [_activeLoadoutId, "actualLoadout", _newLoadout]] call _dbLoadouts;
+						["write", [_activeLoadoutId, "actualTimeStamp", _newTimeStamp]] call _dbLoadouts;
+						
+						_loadoutName = ["read", [_activeLoadoutId, "actualLoadoutName", ""]] call _dbLoadouts;
+						
+						[format ["[%1] PPL Player Request Loadout Update On Disconnect: %2 (%3)", serverTime, _loadoutName, _uid]] call PPL_fnc_log;
+					};
+				}forEach _loadouts;
+			};
+		} forEach _templates;
+	};
+}];
