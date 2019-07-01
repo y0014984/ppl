@@ -62,7 +62,7 @@
 			</Key>
 			<Key ID="STR_PPL_Main_Dialog_Loadouts">
 				<English>Loadouts</English>
-				<German>Loadouts</German>
+				<German>Ausrüstungen</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Dialog_Button_Admin">
 				<English>Admin</English>
@@ -108,7 +108,7 @@
 				<English>Update</English>
 				<German>aktualisieren</German>
 			</Key>
-			<Key ID="STR_PPL_Main_Dialog_Button_Loadouts_Export">
+			<Key ID="STR_PPL_Main_Dialog_Button_Loadout_Export">
 				<English>Export</English>
 				<German>exportieren</German>
 			</Key>
@@ -294,9 +294,9 @@
 				<English>Persistent Player Loadout\nDetails\n\n%1</English>
 				<German>Persistent Player Loadout\nDetails\n\n%1</German>
 			</Key>
-			<Key ID="STR_PPL_Main_Notifications_Loadouts_Exported_To_Clipboard">
-				<English>Persistent Player Loadout\n\nLoadouts exported to Clipboard.</English>
-				<German>Persistent Player Loadout\n\nAusrüstungen in die Zwischenablage exportiert.</German>
+			<Key ID="STR_PPL_Main_Notifications_Loadout_Exported_To_Clipboard">
+				<English>Persistent Player Loadout\n\nLoadout exported to Clipboard.</English>
+				<German>Persistent Player Loadout\n\nAusrüstung in die Zwischenablage exportiert.</German>
 			</Key>
 			<Key ID="STR_PPL_Main_Notifications_No_Loadout_Selected">
 				<English>Persistent Player Loadout\n\nNo loadout selected.</English>

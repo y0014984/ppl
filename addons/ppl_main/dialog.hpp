@@ -225,13 +225,13 @@ class PPL_Main_Dialog
 		class PPL_RscButton_1605: RscButton
 		{
 			idc = 1605;
-			text = $STR_PPL_Main_Dialog_Button_Loadouts_Export;
+			text = $STR_PPL_Main_Dialog_Button_Loadout_Export;
 			x = 27.5 * GUI_GRID_W + GUI_GRID_X;
 			y = 22.5 * GUI_GRID_H + GUI_GRID_Y;
 			w = 6 * GUI_GRID_W;
 			h = 1 * GUI_GRID_H;
 			
-			action = "[] call PPL_fnc_dialogButtonLoadoutsExportExec;";
+			action = "[] call PPL_fnc_dialogButtonLoadoutExportExec;";
 		};
 		class PPL_RscButton_1609: RscButton
 		{

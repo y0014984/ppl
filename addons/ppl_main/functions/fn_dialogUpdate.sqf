@@ -415,14 +415,14 @@ _answer addPublicVariableEventHandler
 		
 		_year = _dbActualTimeStamp select 0;
 		if (_year < 10) then {_year = format ["0%1", str _year];} else {_year = str _year;};
-		_month = _dbSetupTimeStamp select 1;
+		_month = _dbActualTimeStamp select 1;
 		if (_month < 10) then {_month = format ["0%1", str _month];} else {_month = str _month;};
-		_day = _dbSetupTimeStamp select 2;
+		_day = _dbActualTimeStamp select 2;
 		if (_day < 10) then {_day = format ["0%1", str _day];} else {_day = str _day;};
 		
 		_dateStringActual = format ["%1-%2-%3", _year, _month, _day];
 		
-		_loadoutText = _dateStringSetup + " " + _dbSetupLoadoutName + " (" + _dateStringActual + " " + _dbActualLoadoutName + ")";
+		_loadoutText = _dateStringSetup + " " + _dbSetupLoadoutName + " (" + _dateStringActual + ")";
 		
 		if ((((toLower _loadoutText) find (toLower _loadoutsFilter)) > -1) || (_loadoutsFilter == "")) then
 		{

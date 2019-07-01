@@ -24,6 +24,9 @@ _answer addPublicVariableEventHandler
 {
 	params ["_broadcastVariableName", "_broadcastVariableValue", "_broadcastVariableTarget"];
 
+	_templateEditBox = (findDisplay 24984) displayCtrl 1603;
+	_templateEditBox ctrlSetText "";
+
 	[] call PPL_fnc_triggerServerDialogUpdate;
 };
 

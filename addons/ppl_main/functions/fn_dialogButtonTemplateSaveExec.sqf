@@ -24,23 +24,38 @@ _answer addPublicVariableEventHandler
 {
 	params ["_broadcastVariableName", "_broadcastVariableValue", "_broadcastVariableTarget"];
 
+	_templateEditBox = (findDisplay 24984) displayCtrl 1603;
+	_templateEditBox ctrlSetText "";
+
 	[] call PPL_fnc_triggerServerDialogUpdate;
 };
 
-_templateEditBox = (findDisplay 24984) displayCtrl 1603;
-_templateName = ctrlText _templateEditBox;
-_filter = "0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZzÜüÖöÄä[]-_.:#*(){}%$§&<>+-,;'~?= ";
-_templateName = [_templateName, _filter] call BIS_fnc_filterString;
+_pplDialog = findDisplay 24984;
 
-_templateLoadout = getUnitLoadout [player, false];
-
-if (_templateName == "") then
+_playersListBox = _pplDialog displayCtrl 1500;
+_selectedPlayerIndex = lbCurSel _playersListBox;
+		
+if (_selectedPlayerIndex != -1) then
 {
-	hint localize "STR_PPL_Main_Notifications_Missing_Template_Name";
+	_requestedPlayerUid = _playersListBox lbData _selectedPlayerIndex;
+
+	_templateEditBox = (findDisplay 24984) displayCtrl 1603;
+	_templateName = ctrlText _templateEditBox;
+	_filter = "0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZzÜüÖöÄä[]-_.:#*(){}%$§&<>+-,;'~?= ";
+	_templateName = [_templateName, _filter] call BIS_fnc_filterString;
+	
+	if (_templateName != "") then
+	{
+		_request = _playerUid + "-requestTemplateSave";
+		missionNamespace setVariable [_request, [_playerUid, _clientId, _requestedPlayerUid, _templateName], false];
+		publicVariableServer _request;
+	}
+	else
+	{
+		hint localize "STR_PPL_Main_Notifications_Missing_Template_Name";
+	};
 }
 else
 {
-	_request = _playerUid + "-requestTemplateSave";
-	missionNamespace setVariable [_request, [_playerUid, _clientId, _templateName, _templateLoadout], false];
-	publicVariableServer _request;
+	hint localize "STR_PPL_Main_Notifications_No_Player_Selected";
 };
