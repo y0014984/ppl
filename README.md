@@ -16,14 +16,19 @@
     Use of <a href="https://github.com/acemod/ACE3/releases">ACE3</a> and <a href="https://github.com/michail-nikolaev/task-force-arma-3-radio/releases">TFAR</a> is optional. </strong></sup>
 </p>
 
-**PPL** my second attempt of creating a mod for Arma 3. The main goal is to save players actual loadout on serverside for reuse in later events.
+**PPL** my second attempt of creating a mod for Arma 3. The main goal is to save players actual loadout on serverside for reuse in later events. Even half empty magazines are saved and later restored.
 
 The project is entirely **open-source** and all contributions are welcome. Feel free to maintain your own custom version, so long as the changes you make are open to the public in accordance with the ([APL-SA](https://www.bistudio.com/community/licenses/arma-public-license-share-alike)).
 
 ## Features
 
-- Load and save gear on a per player basis.
-- Load gear from templates.
+- Save loadout templates from actual player loadouts.
+- Load templates into players loadouts.
+- Rename and delete templates.
+- Update changed loadout manually.
+- Load actual loadout an event start.
+- User management (Only admins can administer and assign templates.)
+- Loadout saved on server only.
 
 ## Installation
 
