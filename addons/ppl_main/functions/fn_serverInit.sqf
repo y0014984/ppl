@@ -44,7 +44,7 @@ if (isServer && isMultiplayer) then
 		
 		PPL_statusServer = true;
 		publicVariable "PPL_statusServer";
-		PPL_versionServer = "v0.4.2";
+		PPL_versionServer = "v0.3.2";
 		publicVariable "PPL_versionServer";
 		
 		_dbName = "ppl-players";
