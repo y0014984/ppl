@@ -12,8 +12,7 @@
 </p>
 
 <p align="center">
-    <sup><strong>Requires the latest version of <a href="https://github.com/CBATeam/CBA_A3/releases">CBA A3</a> for server and client and <a href="https://github.com/code34/inidbi2">INIDBI2</a> for serverside only.<br/>
-    Use of <a href="https://github.com/acemod/ACE3/releases">ACE3</a> and <a href="https://github.com/michail-nikolaev/task-force-arma-3-radio/releases">TFAR</a> is optional. </strong></sup>
+    <sup><strong>Requires the latest version of <a href="https://github.com/CBATeam/CBA_A3/releases">CBA A3</a> for server and client and <a href="https://github.com/code34/inidbi2">INIDBI2</a> for serverside only.</strong></sup>
 </p>
 
 **PPL** my second attempt of creating a mod for Arma 3. The main goal is to save players actual loadout on serverside for reuse in later events. Even half empty magazines are saved and later restored.
