@@ -38,3 +38,19 @@ missionNamespace setVariable [_request, [_playerUid, _clientId, _requestedPlayer
 publicVariableServer _request;
 
 /* ================================================================================ */
+
+addMissionEventHandler ["Ended",
+{
+	params ["_endType"];
+	
+	_playerUid = getPlayerUID player;
+	_clientId = clientOwner;
+	
+	_requestedPlayerUid = _playerUid;
+	
+	_requestedLoadoutId = "activeLoadout";
+	
+	_request = _playerUid + "-requestLoadoutUpdate";
+	missionNamespace setVariable [_request, [_playerUid, _clientId, _requestedPlayerUid, _requestedLoadoutId], false];
+	publicVariableServer _request;
+}];

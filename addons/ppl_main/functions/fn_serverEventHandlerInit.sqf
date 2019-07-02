@@ -541,7 +541,9 @@ params ["_playerUid"];
 	_isAdminLoggedIn = ["read", [_playerUid, "isAdminLoggedIn", false]] call _dbPlayers;
 	
 	if ((_playerUid == _requestedPlayerUid) || (_isAdmin && _isAdminLoggedIn)) then
-	{		
+	{
+		if (_requestedLoadoutId == "activeLoadout") then {_requestedLoadoutId = ["read", [_playerUid, "activeLoadout", false]] call _dbPlayers;};
+		
 		_dbName = "ppl-templates";
 		_dbTemplates = ["new", _dbName] call OO_INIDBI;
 		
@@ -574,6 +576,16 @@ params ["_playerUid"];
 									["write", [_requestedLoadoutId, "actualTimeStamp", _newTimeStamp]] call _dbLoadouts;
 									
 									["STR_PPL_Main_Notifications_Loadout_Updated"] remoteExecCall ["PPL_fnc_hintLocalized", _clientId];
+									
+									_loadoutName = ["read", [_requestedLoadoutId, "actualLoadoutName", ""]] call _dbLoadouts;
+									
+									_result = true;
+									
+									_answer = _playerUid + "-answerLoadoutUpdate";
+									missionNamespace setVariable [_answer, _result, false];
+									_clientId publicVariableClient _answer;
+									
+									[format ["[%1] PPL Player Request Loadout Update: %2 - %3 (%4)", serverTime, _loadoutName, _requestedPlayerUid, _playerUid]] call PPL_fnc_log;
 								};
 							};
 						} forEach _allPlayerObj;
@@ -581,14 +593,6 @@ params ["_playerUid"];
 				}forEach _loadouts;
 			};
 		} forEach _templates;
-
-		_result = true;
-		
-		_answer = _playerUid + "-answerLoadoutUpdate";
-		missionNamespace setVariable [_answer, _result, false];
-		_clientId publicVariableClient _answer;
-		
-		[format ["[%1] PPL Player Request Loadout Update: %2 - %3 (%4)", serverTime, _loadoutName, _requestedPlayerUid, _playerUid]] call PPL_fnc_log;
 	};
 };
 
@@ -908,14 +912,9 @@ params ["_playerUid"];
 
 /* ================================================================================ */
 
-//Triggered when player disconnects from the game. Similar to onPlayerDisconnected event but can be stacked and 
-//contains the unit occupied by player before disconnect. Must be added on the server and triggers only on the server.
-
 addMissionEventHandler ["HandleDisconnect",
 {
 	params ["_unit", "_id", "_uid", "_name"];
-
-	[format ["[%1] PPL TEST TEST TEST", serverTime]] call PPL_fnc_log;
 
 	_dbName = "ppl-players";
 	_dbPlayers = ["new", _dbName] call OO_INIDBI;
@@ -955,3 +954,5 @@ addMissionEventHandler ["HandleDisconnect",
 		} forEach _templates;
 	};
 }];
+
+/* ================================================================================ */
