@@ -24,9 +24,9 @@ The project is entirely **open-source** and all contributions are welcome. Feel 
 - Save loadout templates from actual player loadouts.
 - Load templates into players loadouts.
 - Rename and delete templates.
-- Update changed loadout manually.
-- Load actual loadout an event start.
-- User management (Only admins can administer and assign templates.)
+- Load active loadout automatically an event start.
+- Save active loadout automaitcally on disconnect or mission end. (manual save is also possible)
+- User management (only admins can administer and assign templates)
 - Loadout saved on server only.
 
 ## Installation
