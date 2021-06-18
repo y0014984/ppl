@@ -15,6 +15,14 @@
     <sup><strong>Requires the latest version of <a href="https://github.com/CBATeam/CBA_A3/releases">CBA A3</a> for server and client and <a href="https://github.com/code34/inidbi2">INIDBI2</a> for serverside only.</strong></sup>
 </p>
 
+<p align="center">
+    <strong>========================================</strong>
+    <br/>
+    <strong>PROJECT DISCONTINUED</strong>
+    <br/>
+    <strong>========================================</strong>
+</p>
+
 **PPL** my second attempt of creating a mod for Arma 3. The main goal is to save players actual loadout on serverside for reuse in later events. Even half empty magazines are saved and later restored.
 
 The project is entirely **open-source** and all contributions are welcome. Feel free to maintain your own custom version, so long as the changes you make are open to the public in accordance with the ([APL-SA](https://www.bistudio.com/community/licenses/arma-public-license-share-alike)).
